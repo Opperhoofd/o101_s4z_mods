@@ -1,0 +1,193 @@
+html.solid-background {
+  background: var(--background-color);
+}
+html.solid-background body {
+  background: transparent !important;
+}
+
+html:not(.overlay-mode) .overlay-only {
+  display: none !important;
+}
+
+html {
+  font-size: 4mm;
+}
+
+html:not(.game-connection) table td .link[data-id=watch] {
+  opacity: 0.2;
+  pointer-events: none;
+}
+
+table {
+  border-collapse: collapse;
+}
+table abbr.unit {
+  font-size: 0.82em;
+  opacity: 0.8;
+  margin-left: 0.1em;
+}
+table tr {
+  --dom-index: 0;
+  --data-index: 0;
+  --height: 2.6em;
+  height: var(--height);
+  transition: background 100ms;
+}
+table tr.hiding {
+  background-color: rgba(186, 188, 1, 0.8705882353);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+table tr.watching {
+  background-image: linear-gradient(135deg, hsla(var(--theme-primary-hue), var(--theme-primary-sat), var(--theme-primary-light), 85%), hsla(var(--theme-primary-hue), var(--theme-primary-sat), calc(var(--theme-primary-light) + (-10% * var(--theme-primary-shade-dir))), 80%));
+  color: hsla(var(--theme-primary-hue), var(--theme-primary-sat), calc(var(--theme-primary-light) + (100% * var(--theme-primary-shade-dir))), 100%);
+}
+table tr.hidden {
+  display: none;
+}
+table tr:hover td {
+  background-color: rgba(51, 51, 51, 0.2);
+}
+table td {
+  transition: background 100ms;
+  text-align: left;
+  padding: 0.18em 0.3em;
+  font-variant: tabular-nums;
+  cursor: pointer;
+  white-space: nowrap;
+  -webkit-user-select: text;
+  user-select: text;
+}
+table td[data-id=name], table td[data-id=f-last], table td[data-id=team], table td[data-id=group], table td[data-id=event], table td[data-id=route] {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: clamp(8ch, 16ch, 18vw);
+}
+table td[data-id=team] {
+  max-width: clamp(6ch, 14ch, 14vw);
+}
+table td[data-id=avatar] {
+  text-align: center;
+}
+table td[data-id=avatar] a.avatar {
+  display: inline-block;
+  border: 1px solid #333;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1.5px solid transparent;
+  transition: border 100ms;
+  vertical-align: middle;
+}
+table td[data-id=avatar] a.avatar:hover {
+  border-color: rgba(0, 136, 238, 0.8);
+}
+table td[data-id=avatar] a.avatar img {
+  height: 1.7em;
+  width: 1.7em;
+  object-fit: cover;
+}
+table td[data-id=nation] img {
+  height: 1em;
+}
+table td[data-id=weight-class] {
+  white-space: nowrap;
+  font-variant-numeric: normal;
+}
+table td[data-id=gap] {
+  white-space: nowrap;
+}
+table td .badge {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 0.15em;
+}
+table td .badge.category {
+  font-variant: none;
+  font-size: 0.86em;
+  padding: 0.2em 0.26em 0.1em;
+  margin-right: 0.5em;
+}
+table td.sorted {
+  background-color: rgba(0, 51, 51, 0.1333333333);
+}
+table td .link {
+  transition: opacity 200ms;
+  display: inline-block;
+  margin-left: 0.1em;
+  margin-top: -0.2em;
+  margin-bottom: -0.1em;
+}
+table td .link:hover ms {
+  opacity: 1 !important;
+}
+table td .link ms {
+  font-size: 1.2em;
+  opacity: 0;
+}
+table tr:hover .link ms {
+  opacity: 0.7;
+}
+
+#content {
+  scroll-behavior: smooth;
+  padding: 0;
+  overflow: auto;
+  overflow: overlay;
+  position: relative;
+  font-size: calc(var(--font-scale) * 1em);
+}
+
+.autoscroll table tr.watching {
+  scroll-snap-align: center;
+}
+.autoscroll #content {
+  scroll-snap-type: y proximity;
+}
+
+#content table tr {
+  height: auto !important;
+}
+#content table tr td {
+  padding: 0px !important;
+  margin: 0px !important;
+  line-height: 100%;
+}
+div .o101 .row-top, div .o101 .row-bottom {
+  display: flex;
+  clear: both;
+  padding: 1px 5px 1px 5px;
+}
+div .o101 .row-bottom {
+  font-size: smaller;
+  border-bottom: grey 1px double;
+}
+div .o101 .col-f-last {
+  width: 130px;
+  font-weight: bold;
+}
+div .o101 .col-nation {
+  width: 20px;
+  text-align: right;
+  font-size: smaller;
+}
+div .o101 .col-gap {
+  width: 100%;
+  text-align: left;
+}
+div .o101 .col-wkg-cur {
+  width: 50px;
+  text-align: right;
+  font-weight: bold;
+}
+.col-wkg-cur-orange {
+  color: orange;
+}
+.col-wkg-cur-red {
+  color: red;
+}
+.col-wkg-cur-purple {
+  color: purple;
+}

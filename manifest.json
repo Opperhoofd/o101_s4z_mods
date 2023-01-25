@@ -1,0 +1,25 @@
+{
+    "manifest_version": 1,
+    "name": "O101 for S4Z",
+    "description": "A better nearby riders MOD",
+    "author": "Onno Aphinan",
+    "website_url": "https://github.com/O101",
+    "version": "0.0.1",
+    "web_root": "pages",
+    "windows": [
+    {
+        "file": "pages/nearby.html",
+        "id": "O101-nearby",
+        "name": "O101 - nearby",
+        "description": "Zwift nearby riders with extra details",
+        "always_visible": true,
+        "overlay": true,
+        "frame": false,
+        "default_bounds": {
+            "width": 800,
+            "height": 800,
+            "x": -300,
+            "y": 100
+        }
+    }]
+}
