@@ -158,29 +158,37 @@ table tr:hover .link ms {
 div .o101 .row-top, div .o101 .row-bottom {
   display: flex;
   clear: both;
-  padding: 1px 5px 1px 5px;
-}
-div .o101 .row-bottom {
-  font-size: smaller;
-  border-bottom: grey 1px double;
+  padding: 4px 6px 4px 6px;
 }
 div .o101 .col-f-last {
-  width: 130px;
+  width: 225px;
   font-weight: bold;
+  font-size: larger;
 }
-div .o101 .col-nation {
-  width: 20px;
+div .o101 .col-team {
+  width: 80px;
   text-align: right;
-  font-size: smaller;
+}
+div .o101 .row-bottom {
+  border-bottom: grey 1px double;
 }
 div .o101 .col-gap {
+  text-align: right;
+  padding-left: 10px;
+}
+div .o101 .col-gap-distance {
+  text-align: right;
+  padding-left: 10px;
+}
+div .o101 .col-hr-cur {
   width: 100%;
-  text-align: left;
+  text-align: right;
 }
 div .o101 .col-wkg-cur {
-  width: 50px;
   text-align: right;
   font-weight: bold;
+  padding-left: 10px;
+  font-size: larger;
 }
 .col-wkg-cur-orange {
   color: orange;

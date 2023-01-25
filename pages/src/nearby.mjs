@@ -31,7 +31,7 @@ const unit = x => `<abbr class="unit">${x}</abbr>`;
 const spd = (v, entry) => H.pace(v, {precision: 0, suffix: true, html: true, sport: entry.state.sport});
 const weightClass = v => H.weightClass(v, {suffix: true, html: true});
 const pwr = v => H.power(v, {suffix: true, html: true});
-const hr = v => v ? num(v) + unit('bpm') : '-';
+const hr = v => v ? num(v) + unit('bpm') : '';
 const kj = (v, options) => v != null ? num(v, options) + unit('kJ') : '-';
 const pct = v => (v != null && !isNaN(v) && v !== Infinity && v !== -Infinity) ? num(v) + unit('%') : '-';
 const gapTime = (v, entry) => H.timer(v) + (entry.isGapEst ? '<small> (est)</small>' : ' ');
@@ -601,12 +601,12 @@ function updateTableRow(row, info) {
         row.dataset.id = info.athleteId;
     }
     
-    //const visibleData = ['nation','f-last','gap','gap-distance','position','wkg-cur','spd-cur','hr-cur'];
-    const visibleData = ['nation','f-last','gap','gap-distance','wkg-cur'];
+    //const visibleData = ['f-last','team','gap','gap-distance','position','wkg-cur','spd-cur','hr-cur'];
+    const visibleData = ['f-last','team','gap','gap-distance','wkg-cur','hr-cur'];
     let rowHtml = '<td><div class="o101">';
     let wkgCurColor = '';
-    rowHtml += '<div class="row-top"><div class="col-f-last">_f-last_</div><div class="col-nation">_nation_</div></div>';
-    rowHtml += '<div class="row-bottom"><div class="col-gap">_gap_s (_gap-distance_)</div><div class="col-wkg-cur _wkg-cur-color_">_wkg-cur_</div></div>';
+    rowHtml += '<div class="row-top"><div class="col-f-last">_f-last_</div><div class="col-team">_team_</div></div>';
+    rowHtml += '<div class="row-bottom"><div class="col-gap">_gap_</div><div class="col-gap-distance">_gap-distance_</div><div class="col-hr-cur">_hr-cur_</div><div class="col-wkg-cur _wkg-cur-color_">_wkg-cur_</div></div>';
     rowHtml += '</div></td>';
 
     for (const [i, {id, get, fmt}] of enFields.entries()) {
@@ -619,13 +619,20 @@ function updateTableRow(row, info) {
             value = null;
         }
 
-        // if (id === 'nation'){
+        let html = '' + (fmt ? fmt(value, info) : value != null ? value : '');
+
+        // if (id === 'nation'){team
         //     //<img src="deps/flags/nl.png"/>
         //     rowHtml = rowHtml.replace('_'+id+'_', value);
         //     continue;
         // }
-
-        let html = '' + (fmt ? fmt(value, info) : value != null ? value : '-');
+        if (id === 'gap' && html.indexOf(':')<0) {
+            if (html.indexOf(':') >= 0) {
+                html = html.replace(':', 'm');
+            } else {
+                html += ' s';
+            }
+        }
 
         if (id === 'wkg-cur') {
             let wkg = value / (info.athlete && info.athlete.weight);
