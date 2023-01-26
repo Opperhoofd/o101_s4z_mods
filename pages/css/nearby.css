@@ -204,7 +204,6 @@ div .o101 .row-bottom {
 div .o101 .col-gap {
   width: 20%;
   text-align: right;
-  padding-left: 10px;
 }
 div .o101 .col-gap-distance {
   width: 80%;
@@ -221,6 +220,12 @@ div .o101 .col-wkg-cur {
   font-weight: bold;
 }
 
+.is-in-group {
+  background-color: #1e3f66;
+}
+.is-me-in-group {
+  background-color: #1192cc;
+}
 .col-wkg-cur-orange {
   color: orange;
 }

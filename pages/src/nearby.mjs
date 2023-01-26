@@ -79,9 +79,11 @@ const lazyGetRoute = makeLazyGetter(id => common.rpc.getRoute(id));
 function fmtDist(v) {
     if (v == null || v === Infinity || v === -Infinity || isNaN(v)) {
         return '-';
-    } else {
+    } else if (Math.abs(v) < 1000) {
         const suffix = unit(imperial ? 'ft' : 'm');
         return H.number(imperial ? v / L.metersPerFoot : v) + suffix;
+    } else {
+        return H.distance(v, {precision: 1, suffix: true, html: true});
     }
 }
 function fmtDur(v) {
@@ -669,6 +671,7 @@ function updateTableRowO101(row, info) {
     }
 
     let wkgCurColor = '';
+    let isInGroup = '';
     let rowHtml = createTableRowInnerHtmlO101(true);
 
     for (const [i, {id, get, fmt}] of enFields.entries()) {
@@ -686,6 +689,7 @@ function updateTableRowO101(row, info) {
         if (id === 'gap') {
             if (value > -1 && value < 1) {
                 html = '&nbsp;';
+                isInGroup = true;
             } else {
                 const isMin = html.indexOf('-') >= 0;
                 html = html.replace('-', '');
@@ -719,12 +723,21 @@ function updateTableRowO101(row, info) {
 
         rowHtml = rowHtml.replace('_'+id+'_', html);
     }
+
+    if (isInGroup === true) {
+        if (info.watching === true) {
+            rowHtml = rowHtml.replace('_is-in-group_', 'is-me-in-group');
+        } else {
+            rowHtml = rowHtml.replace('_is-in-group_', 'is-in-group');
+        }
+    }
     rowHtml = rowHtml.replace('_wkg-cur-color_', wkgCurColor);
+
     row.innerHTML = rowHtml;
 }
 
 function createTableRowInnerHtmlO101(withWkgCurColor) {
-    let html = '<td><div class="o101  _wkg-cur-color_">';
+    let html = '<td><div class="o101 _is-in-group_ _wkg-cur-color_">';
     html += '<div class="row-top"><div class="col-f-last">_f-last_</div><div class="col-team">_team_</div></div>';
     html += '<div class="row-bottom"><div class="col-gap">_gap_</div><div class="col-gap-distance">_gap-distance_</div><div class="col-hr-cur">_hr-cur_</div><div class="col-wkg-cur">_wkg-cur_</div></div>';
     html += '</div></td>';
