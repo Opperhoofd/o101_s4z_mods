@@ -13,7 +13,6 @@ let fieldStates;
 let nearbyData;
 let enFields;
 let sortBy;
-let sortByDir;
 let table;
 let tbody;
 let gameConnection;
@@ -80,22 +79,18 @@ function fmtDist(v) {
     if (v == null || v === Infinity || v === -Infinity || isNaN(v)) {
         return '-';
     } else if (Math.abs(v) < 1000) {
-        const suffix = unit(imperial ? 'ft' : ' m');
+        const suffix = unit(imperial ? 'ft' : 'm');
         return H.number(imperial ? v / L.metersPerFoot : v) + suffix;
     } else {
         return H.distance(v, {precision: 1, suffix: true, html: true});
     }
 }
-
-
 function fmtDur(v) {
     if (v == null || v === Infinity || v === -Infinity || isNaN(v)) {
         return '-';
     }
     return H.timer(v);
 }
-
-
 function fmtWkg(v, entry) {
     if (v == null) {
         return '-';
@@ -104,8 +99,6 @@ function fmtWkg(v, entry) {
     return (wkg !== Infinity && wkg !== -Infinity && !isNaN(wkg)) ?
         num(wkg, {precision: 1, fixed: true}) + unit(' W/kg') : '&nbsp;';
 }
-
-
 function fmtName(name, entry) {
     let badge;
     const sgid = entry.state.eventSubgroupId;
@@ -115,10 +108,9 @@ function fmtName(name, entry) {
             badge = common.eventBadge(sg.subgroupLabel);
         }
     }
-    return athleteLink(entry.athleteId, (badge || '') + common.sanitize(name || '-'));
+
+    return athleteLink(entry.athleteId, (badge || '') + formatNameO101(common.sanitize(name || '-')));
 }
-
-
 function fmtRoute({route, laps}) {
     if (!route) {
         return '-';
@@ -130,8 +122,6 @@ function fmtRoute({route, laps}) {
     parts.push(route.name);
     return parts.join(' ');
 }
-
-
 function fmtEvent(sgid) {
     if (!sgid) {
         return '-';
@@ -426,7 +416,7 @@ const fieldGroups = [{
 
 export async function main() {
     common.initInteractionListeners();
-    common.initNationFlags();  // bg okay
+    //common.initNationFlags();  // bg okay
     let onlyMarked = common.settingsStore.get('onlyMarked');
     let onlySameCategory= common.settingsStore.get('onlySameCategory');
     let onlySameTeam= common.settingsStore.get('onlySameTeam');
@@ -583,7 +573,87 @@ function gentleClassToggle(el, cls, force) {
 }
 
 
-function updateTableRow(row, info) {
+let frames = 0;
+function renderData(data, {recenter}={}) {
+    if (!data || !data.length || document.hidden) {
+        return;
+    }
+    const centerIdx = data.findIndex(x => x.watching);
+    const watchingRow = tbody.querySelector('tr.watching') || tbody.appendChild(makeTableRow());
+    let row = watchingRow;
+    for (let i = centerIdx; i >= 0; i--) {
+        updateTableRowO101(row, data[i]);
+        if (i) {
+            row = row.previousElementSibling || row.insertAdjacentElement('beforebegin', makeTableRow());
+            gentleClassToggle(row, 'hidden', false);
+        }
+    }
+    while (row.previousElementSibling) {
+        gentleClassToggle(row = row.previousElementSibling, 'hidden', true);
+    }
+    row = watchingRow;
+    for (let i = centerIdx + 1; i < data.length; i++) {
+        row = row.nextElementSibling || row.insertAdjacentElement('afterend', makeTableRow());
+        updateTableRowO101(row, data[i]);
+        gentleClassToggle(row, 'hidden', false);
+    }
+    while (row.nextElementSibling) {
+        gentleClassToggle(row = row.nextElementSibling, 'hidden', true);
+    }
+    if ((!frames++ || recenter) && common.settingsStore.get('autoscroll')) {
+        requestAnimationFrame(() => {
+            const row = tbody.querySelector('tr.watching');
+            if (row) {
+                row.scrollIntoView({block: 'center'});
+            }
+        });
+    }
+}
+
+
+function setBackground() {
+    const {solidBackground, backgroundColor} = common.settingsStore.get();
+    doc.classList.toggle('solid-background', !!solidBackground);
+    if (solidBackground) {
+        doc.style.setProperty('--background-color', backgroundColor);
+    } else {
+        doc.style.removeProperty('--background-color');
+    }
+}
+
+
+export async function settingsMain() {
+    common.initInteractionListeners();
+    fieldStates = common.storage.get(fieldsKey);
+    const form = document.querySelector('form#fields');
+    form.addEventListener('input', ev => {
+        const id = ev.target.name;
+        fieldStates[id] = ev.target.checked;
+        common.storage.set(fieldsKey, fieldStates);
+    });
+    for (const {fields, label} of fieldGroups) {
+        form.insertAdjacentHTML('beforeend', [
+            '<div class="field-group">',
+                `<div class="title">${label}:</div>`,
+                ...fields.map(x => `
+                    <label title="${common.sanitizeAttr(x.tooltip || '')}">
+                        <key>${x.label}</key>
+                        <input type="checkbox" name="${x.id}" ${fieldStates[x.id] ? 'checked' : ''}/>
+                    </label>
+                `),
+            '</div>'
+        ].join(''));
+    }
+    await common.initSettingsForm('form#options')();
+}
+
+
+
+
+
+const visibleDataO101 = ['f-last','team','gap','gap-distance','wkg-cur','hr-cur'];
+
+function updateTableRowO101(row, info) {
     if (row.title && !gameConnection) {
         row.title = '';
     } else if (!row.title && gameConnection) {
@@ -598,20 +668,12 @@ function updateTableRow(row, info) {
     if (row.dataset.id !== '' + info.athleteId) {
         row.dataset.id = info.athleteId;
     }
-    
-    //const visibleData = ['f-last','team','gap','gap-distance','position','wkg-cur','spd-cur','hr-cur'];
-    const visibleData = ['f-last','team','gap','gap-distance','wkg-cur','hr-cur'];
-    const hideFromWatching = ['gap', 'gap-distance'];
+
     let wkgCurColor = '';
     let rowHtml = createTableRowInnerHtmlO101(true);
 
     for (const [i, {id, get, fmt}] of enFields.entries()) {
-        if(!visibleData.includes(id)) continue;
-
-        if (info.watching && hideFromWatching.includes(id)) {
-            rowHtml = rowHtml.replace('_'+id+'_', '');
-            continue;
-        }
+        if(!visibleDataO101.includes(id)) continue;
 
         let value;
         try {
@@ -622,21 +684,23 @@ function updateTableRow(row, info) {
 
         let html = '' + (fmt ? fmt(value, info) : value != null ? value : '');
 
-        if (id === 'f-last') {
-            html = formatNameO101(value);
-        }
-
         if (id === 'gap') {
             html = html.replace('-', '');
-            if (html.indexOf(':') >= 0) {
+            if (value > -1 && value < 1) {
+                html = '&nbsp;';
+            } else if (html.indexOf(':') >= 0) {
                 html = html.replace(':', 'm');
             } else {
-                html += ' s';
+                html += 's';
             }
         }
 
         if (id === 'gap-distance') {
-            html = html.replace('-', '');
+            if (value > -5 && value < 5) {
+                html = '&nbsp;';
+            } else {
+                html = html.replace('-', '');
+            }
         }
 
         if (id === 'wkg-cur') {
@@ -697,76 +761,4 @@ function stripSpamFromNameO101(value) {
     value = value.replace(/[0-9]/g, '');
 
     return value.trim();
-}
-
-let frames = 0;
-function renderData(data, {recenter}={}) {
-    if (!data || !data.length || document.hidden) {
-        return;
-    }
-    const centerIdx = data.findIndex(x => x.watching);
-    const watchingRow = tbody.querySelector('tr.watching') || tbody.appendChild(makeTableRow());
-    let row = watchingRow;
-    for (let i = centerIdx; i >= 0; i--) {
-        updateTableRow(row, data[i]);
-        if (i) {
-            row = row.previousElementSibling || row.insertAdjacentElement('beforebegin', makeTableRow());
-        }
-    }
-    while (row.previousElementSibling) {
-        gentleClassToggle(row = row.previousElementSibling, 'hidden', true);
-    }
-    row = watchingRow;
-    for (let i = centerIdx + 1; i < data.length; i++) {
-        row = row.nextElementSibling || row.insertAdjacentElement('afterend', makeTableRow());
-        updateTableRow(row, data[i]);
-    }
-    while (row.nextElementSibling) {
-        gentleClassToggle(row = row.nextElementSibling, 'hidden', true);
-    }
-    if ((!frames++ || recenter) && common.settingsStore.get('autoscroll')) {
-        requestAnimationFrame(() => {
-            const row = tbody.querySelector('tr.watching');
-            if (row) {
-                row.scrollIntoView({block: 'center'});
-            }
-        });
-    }
-}
-
-
-function setBackground() {
-    const {solidBackground, backgroundColor} = common.settingsStore.get();
-    doc.classList.toggle('solid-background', !!solidBackground);
-    if (solidBackground) {
-        doc.style.setProperty('--background-color', backgroundColor);
-    } else {
-        doc.style.removeProperty('--background-color');
-    }
-}
-
-
-export async function settingsMain() {
-    common.initInteractionListeners();
-    fieldStates = common.storage.get(fieldsKey);
-    const form = document.querySelector('form#fields');
-    form.addEventListener('input', ev => {
-        const id = ev.target.name;
-        fieldStates[id] = ev.target.checked;
-        common.storage.set(fieldsKey, fieldStates);
-    });
-    for (const {fields, label} of fieldGroups) {
-        form.insertAdjacentHTML('beforeend', [
-            '<div class="field-group">',
-                `<div class="title">${label}:</div>`,
-                ...fields.map(x => `
-                    <label title="${common.sanitizeAttr(x.tooltip || '')}">
-                        <key>${x.label}</key>
-                        <input type="checkbox" name="${x.id}" ${fieldStates[x.id] ? 'checked' : ''}/>
-                    </label>
-                `),
-            '</div>'
-        ].join(''));
-    }
-    await common.initSettingsForm('form#options')();
 }
