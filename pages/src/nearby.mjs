@@ -31,7 +31,7 @@ const unit = x => `<abbr class="unit">${x}</abbr>`;
 const spd = (v, entry) => H.pace(v, {precision: 0, suffix: true, html: true, sport: entry.state.sport});
 const weightClass = v => H.weightClass(v, {suffix: true, html: true});
 const pwr = v => H.power(v, {suffix: true, html: true});
-const hr = v => v ? num(v) + unit('bpm') : '';
+const hr = v => v ? num(v) + unit('bpm') : '&nbsp;';
 const kj = (v, options) => v != null ? num(v, options) + unit('kJ') : '-';
 const pct = v => (v != null && !isNaN(v) && v !== Infinity && v !== -Infinity) ? num(v) + unit('%') : '-';
 const gapTime = (v, entry) => H.timer(v) + (entry.isGapEst ? '<small> (est)</small>' : ' ');
@@ -80,7 +80,7 @@ function fmtDist(v) {
     if (v == null || v === Infinity || v === -Infinity || isNaN(v)) {
         return '-';
     } else if (Math.abs(v) < 1000) {
-        const suffix = unit(imperial ? ' ft' : ' m');
+        const suffix = unit(imperial ? 'ft' : ' m');
         return H.number(imperial ? v / L.metersPerFoot : v) + suffix;
     } else {
         return H.distance(v, {precision: 1, suffix: true, html: true});
@@ -102,8 +102,7 @@ function fmtWkg(v, entry) {
     }
     const wkg = v / (entry.athlete && entry.athlete.weight);
     return (wkg !== Infinity && wkg !== -Infinity && !isNaN(wkg)) ?
-        num(wkg, {precision: 1, fixed: true}) + unit(' W/kg') :
-        '-';
+        num(wkg, {precision: 1, fixed: true}) + unit(' W/kg') : '&nbsp;';
 }
 
 
@@ -561,7 +560,6 @@ function render() {
         sortBy = enFields[0].id;
     }
     sortByDir = common.storage.get('nearby-sort-dir', -1);
-    const sortDirClass = sortByDir > 0 ? 'sort-asc' : 'sort-desc';
     table = document.querySelector('#content table');
     tbody = table.querySelector('tbody');
     tbody.innerHTML = '';
@@ -570,7 +568,7 @@ function render() {
 
 function makeTableRow() {
     const tr = document.createElement('tr');
-    tr.innerHTML = enFields.map(({id}) => `<td data-id="${id}"></td>`).join('');
+    tr.innerHTML = createTableRowInnerHtmlO101(false);
     return tr;
 }
 
@@ -603,14 +601,17 @@ function updateTableRow(row, info) {
     
     //const visibleData = ['f-last','team','gap','gap-distance','position','wkg-cur','spd-cur','hr-cur'];
     const visibleData = ['f-last','team','gap','gap-distance','wkg-cur','hr-cur'];
-    let rowHtml = '<td><div class="o101">';
+    const hideFromWatching = ['gap', 'gap-distance'];
     let wkgCurColor = '';
-    rowHtml += '<div class="row-top"><div class="col-f-last">_f-last_</div><div class="col-team">_team_</div></div>';
-    rowHtml += '<div class="row-bottom"><div class="col-gap">_gap_</div><div class="col-gap-distance">_gap-distance_</div><div class="col-hr-cur">_hr-cur_</div><div class="col-wkg-cur _wkg-cur-color_">_wkg-cur_</div></div>';
-    rowHtml += '</div></td>';
+    let rowHtml = createTableRowInnerHtmlO101(true);
 
     for (const [i, {id, get, fmt}] of enFields.entries()) {
         if(!visibleData.includes(id)) continue;
+
+        if (info.watching && hideFromWatching.includes(id)) {
+            rowHtml = rowHtml.replace('_'+id+'_', '');
+            continue;
+        }
 
         let value;
         try {
@@ -621,17 +622,21 @@ function updateTableRow(row, info) {
 
         let html = '' + (fmt ? fmt(value, info) : value != null ? value : '');
 
-        // if (id === 'nation'){team
-        //     //<img src="deps/flags/nl.png"/>
-        //     rowHtml = rowHtml.replace('_'+id+'_', value);
-        //     continue;
-        // }
-        if (id === 'gap' && html.indexOf(':')<0) {
+        if (id === 'f-last') {
+            html = formatNameO101(value);
+        }
+
+        if (id === 'gap') {
+            html = html.replace('-', '');
             if (html.indexOf(':') >= 0) {
                 html = html.replace(':', 'm');
             } else {
                 html += ' s';
             }
+        }
+
+        if (id === 'gap-distance') {
+            html = html.replace('-', '');
         }
 
         if (id === 'wkg-cur') {
@@ -653,33 +658,51 @@ function updateTableRow(row, info) {
     row.innerHTML = rowHtml;
 }
 
+function createTableRowInnerHtmlO101(withWkgCurColor) {
+    let html = '<td><div class="o101">';
+    html += '<div class="row-top"><div class="col-f-last">_f-last_</div><div class="col-team">_team_</div></div>';
+    html += '<div class="row-bottom"><div class="col-gap">_gap_</div><div class="col-gap-distance">_gap-distance_</div><div class="col-hr-cur">_hr-cur_</div><div class="col-wkg-cur _wkg-cur-color_">_wkg-cur_</div></div>';
+    html += '</div></td>';
+
+    return withWkgCurColor ? html : html.replace('_wkg-cur-color_', '');
+}
+
+function formatNameO101(value) {
+    const nameParts = value.split('.');
+    let first = nameParts[0]+'';
+    let last = nameParts[1]+'';
+            
+    if (first.length>0 && last.length>0) {
+        first = first.substring(0,1).toUpperCase();
+        last = stripSpamFromNameO101(last);
+
+        if (last.length>1) {
+            last = last.substring(0,1).toUpperCase() + last.substring(1).toLowerCase()
+        }
+    }
+
+    return first + '. ' + last;
+}
+
+function stripSpamFromNameO101(value) {
+    const spamChars = ['[','(','/','|',',','#','-','Team','TEAM','team','Year','YEAR','year'];
+
+    for (let i = 0; i < spamChars.length; i++) {
+        if (value.indexOf(spamChars[i])>0) {
+            const nameParts = value.split(spamChars[i]);
+            value = nameParts[0];
+        }
+    }
+
+    value = value.replace(/[0-9]/g, '');
+
+    return value.trim();
+}
+
 let frames = 0;
 function renderData(data, {recenter}={}) {
     if (!data || !data.length || document.hidden) {
         return;
-    }
-    const sortField = enFields.find(x => x.id === sortBy);
-    const sortGet = sortField && (sortField.sortValue || sortField.get);
-    if (sortGet) {
-        data.sort((a, b) => {
-            let av = sortGet(a);
-            let bv = sortGet(b);
-            if (Array.isArray(av)) {
-                av = av[0];
-            }
-            if (Array.isArray(bv)) {
-                bv = bv[0];
-            }
-            if (av == bv) {
-                return 0;
-            } else if (av == null || bv == null) {
-                return av == null ? 1 : -1;
-            } else if (typeof av === 'number') {
-                return (av < bv ? 1 : -1) * sortByDir;
-            } else {
-                return (('' + av).toLowerCase() < ('' + bv).toLowerCase() ? 1 : -1) * sortByDir;
-            }
-        });
     }
     const centerIdx = data.findIndex(x => x.watching);
     const watchingRow = tbody.querySelector('tr.watching') || tbody.appendChild(makeTableRow());

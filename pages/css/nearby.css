@@ -155,41 +155,67 @@ table tr:hover .link ms {
   margin: 0px !important;
   line-height: 100%;
 }
+
+div .o101-head {
+  color: black;
+  background-color: white;
+  width: 250px;  /* 250px | 298px */
+  text-align: center;
+  font-weight: bold;
+  font-size: large;
+  position: sticky;
+  top: 0;
+}
+
 div .o101 .row-top, div .o101 .row-bottom {
   display: flex;
   clear: both;
-  padding: 4px 6px 4px 6px;
+  padding: 2px 4px 0px 4px; /*top right bottom left*/
+  width: 250px; /* 250px | 298px */
+}
+
+div .o101 .row-top {
+  padding-top: 2px;
+  padding-bottom: 2px;
+  font-size: large;
 }
 div .o101 .col-f-last {
-  width: 225px;
+  width: 100%;
+  max-width: 175px;
   font-weight: bold;
-  font-size: larger;
+  overflow: hidden
 }
 div .o101 .col-team {
-  width: 80px;
+  zoom: 0.6;
+  width: 115px;
   text-align: right;
 }
+
 div .o101 .row-bottom {
   border-bottom: grey 1px double;
+  font-size: smaller;
 }
 div .o101 .col-gap {
   text-align: right;
   padding-left: 10px;
 }
 div .o101 .col-gap-distance {
+  width: 60px;
   text-align: right;
   padding-left: 10px;
 }
 div .o101 .col-hr-cur {
-  width: 100%;
+  width: 120px;
   text-align: right;
 }
 div .o101 .col-wkg-cur {
   text-align: right;
-  font-weight: bold;
   padding-left: 10px;
-  font-size: larger;
+  font-size: large;
+  font-weight: bold;
+  margin-top: -2px;
 }
+
 .col-wkg-cur-orange {
   color: orange;
 }
