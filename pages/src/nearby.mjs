@@ -13,6 +13,7 @@ let fieldStates;
 let nearbyData;
 let enFields;
 let sortBy;
+let sortByDir;
 let table;
 let tbody;
 let gameConnection;
@@ -78,11 +79,9 @@ const lazyGetRoute = makeLazyGetter(id => common.rpc.getRoute(id));
 function fmtDist(v) {
     if (v == null || v === Infinity || v === -Infinity || isNaN(v)) {
         return '-';
-    } else if (Math.abs(v) < 1000) {
+    } else {
         const suffix = unit(imperial ? 'ft' : 'm');
         return H.number(imperial ? v / L.metersPerFoot : v) + suffix;
-    } else {
-        return H.distance(v, {precision: 1, suffix: true, html: true});
     }
 }
 function fmtDur(v) {
@@ -685,13 +684,15 @@ function updateTableRowO101(row, info) {
         let html = '' + (fmt ? fmt(value, info) : value != null ? value : '');
 
         if (id === 'gap') {
-            html = html.replace('-', '');
             if (value > -1 && value < 1) {
                 html = '&nbsp;';
-            } else if (html.indexOf(':') >= 0) {
-                html = html.replace(':', 'm');
             } else {
-                html += 's';
+                const isMin = html.indexOf('-') >= 0;
+                html = html.replace('-', '');
+                if (html.indexOf(':') < 0) {
+                    html = html < 10 ? '0:0'+html : '0:'+html;
+                }
+                html = isMin ? '-'+html: '+'+html;
             }
         }
 
