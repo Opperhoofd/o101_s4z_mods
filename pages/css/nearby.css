@@ -159,10 +159,10 @@ table tr:hover .link ms {
 div .o101-head {
   color: black;
   background-color: white;
-  width: 250px;  /* 250px | 298px */
+  width: 100%;
   text-align: center;
   font-weight: bold;
-  font-size: large;
+  font-size: larger;
   position: sticky;
   top: 0;
 }
@@ -170,24 +170,21 @@ div .o101-head {
 div .o101 .row-top, div .o101 .row-bottom {
   display: flex;
   clear: both;
-  padding: 2px 4px 0px 4px; /*top right bottom left*/
-  width: 250px; /* 250px | 298px */
+  padding: 0px 4px 0px 4px; /*top right bottom left*/
+  width: 100%;
 }
 
 div .o101 .row-top {
-  padding-top: 2px;
-  padding-bottom: 2px;
-  font-size: large;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  font-size: larger;
 }
 div .o101 .col-f-last {
   width: 100%;
-  max-width: 175px;
   font-weight: bold;
-  overflow: hidden
 }
 div .o101 .col-team {
   zoom: 0.6;
-  width: 115px;
   text-align: right;
 }
 
@@ -205,13 +202,13 @@ div .o101 .col-gap-distance {
   padding-left: 10px;
 }
 div .o101 .col-hr-cur {
-  width: 120px;
+  width: 100%;
   text-align: right;
+  padding-right: 10px;
 }
 div .o101 .col-wkg-cur {
   text-align: right;
-  padding-left: 10px;
-  font-size: large;
+  font-size: larger;
   font-weight: bold;
   margin-top: -2px;
 }

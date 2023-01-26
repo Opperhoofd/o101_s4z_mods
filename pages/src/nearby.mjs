@@ -641,13 +641,13 @@ function updateTableRow(row, info) {
 
         if (id === 'wkg-cur') {
             let wkg = value / (info.athlete && info.athlete.weight);
-            if (wkg>5) {
+            if (wkg>=5) {
                 wkgCurColor = 'col-wkg-cur-orange';
             }
-            if (wkg>8) {
+            if (wkg>=8) {
                 wkgCurColor = 'col-wkg-cur-red';
             }
-            if (wkg>11) {
+            if (wkg>=11) {
                 wkgCurColor = 'col-wkg-cur-purple';
             }
         }
@@ -659,9 +659,9 @@ function updateTableRow(row, info) {
 }
 
 function createTableRowInnerHtmlO101(withWkgCurColor) {
-    let html = '<td><div class="o101">';
+    let html = '<td><div class="o101  _wkg-cur-color_">';
     html += '<div class="row-top"><div class="col-f-last">_f-last_</div><div class="col-team">_team_</div></div>';
-    html += '<div class="row-bottom"><div class="col-gap">_gap_</div><div class="col-gap-distance">_gap-distance_</div><div class="col-hr-cur">_hr-cur_</div><div class="col-wkg-cur _wkg-cur-color_">_wkg-cur_</div></div>';
+    html += '<div class="row-bottom"><div class="col-gap">_gap_</div><div class="col-gap-distance">_gap-distance_</div><div class="col-hr-cur">_hr-cur_</div><div class="col-wkg-cur">_wkg-cur_</div></div>';
     html += '</div></td>';
 
     return withWkgCurColor ? html : html.replace('_wkg-cur-color_', '');
@@ -681,7 +681,7 @@ function formatNameO101(value) {
         }
     }
 
-    return first + '. ' + last;
+    return first + '. ' + last??'';
 }
 
 function stripSpamFromNameO101(value) {
