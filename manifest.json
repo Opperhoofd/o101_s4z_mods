@@ -1,0 +1,25 @@
+{
+    "manifest_version": 1,
+    "name": "O101 for S4Z",
+    "description": "A better nearby riders MOD",
+    "author": "Onno Aphinan",
+    "website_url": "https://github.com/O101",
+    "version": "0.0.1",
+    "web_root": "pages",
+    "windows": [
+    {
+        "file": "pages/nearby-race.html",
+        "id": "O101-nearby-race",
+        "name": "O101 - nearby race",
+        "description": "A nearby riders optimized for racing",
+        "always_visible": true,
+        "overlay": true,
+        "frame": false,
+        "default_bounds": {
+            "width": 800,
+            "height": 800,
+            "x": -300,
+            "y": 100
+        }
+    }]
+}
