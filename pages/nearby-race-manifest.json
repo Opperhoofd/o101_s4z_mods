@@ -1,10 +1,10 @@
 {
-    "short_name": "Nearby",
-    "name": "Sauce for Zwift™ - Nearby",
+    "short_name": "Nearby-Race",
+    "name": "Sauce for Zwift™ - Nearby Race",
     "background_color": "black",
     "theme_color": "black",
-    "description": "Sauce for Zwift - Nearby Raw Data",
-    "start_url": "/pages/nearby.html",
+    "description": "Sauce for Zwift - Nearby riders optimized for racing",
+    "start_url": "/pages/nearby-race.html",
     "display": "standalone",
     "orientation": "any",
     "icons": [{

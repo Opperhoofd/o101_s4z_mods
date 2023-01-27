@@ -8,10 +8,10 @@
     "web_root": "pages",
     "windows": [
     {
-        "file": "pages/nearby.html",
-        "id": "O101-nearby",
-        "name": "O101 - nearby",
-        "description": "Zwift nearby riders with extra details",
+        "file": "pages/nearby-race.html",
+        "id": "O101-nearby-race",
+        "name": "O101 - nearby race",
+        "description": "A nearby riders optimized for racing",
         "always_visible": true,
         "overlay": true,
         "frame": false,
