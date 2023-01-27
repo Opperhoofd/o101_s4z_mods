@@ -220,11 +220,17 @@ div .o101 .col-wkg-cur {
   font-weight: bold;
 }
 
-.is-in-group {
-  background-color: #1e3f66;
+.is-rider-in-group {
+  background-color: #000;
 }
-.is-me-in-group {
+.is-rider-out-of-group {
+  background-color: #101010;
+}
+.is-rider-me {
   background-color: #1192cc;
+}
+.is-rider-special {
+  background-color: #f36d3f;
 }
 .col-wkg-cur-orange {
   color: orange;

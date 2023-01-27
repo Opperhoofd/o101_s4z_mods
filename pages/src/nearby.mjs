@@ -724,20 +724,23 @@ function updateTableRowO101(row, info) {
         rowHtml = rowHtml.replace('_'+id+'_', html);
     }
 
+    let bgSpecial = 'is-rider-out-of-group';
     if (isInGroup === true) {
-        if (info.watching === true) {
-            rowHtml = rowHtml.replace('_is-in-group_', 'is-me-in-group');
-        } else {
-            rowHtml = rowHtml.replace('_is-in-group_', 'is-in-group');
-        }
+        bgSpecial = info.watching === true ? 'is-rider-me' : 'is-rider-in-group';
+        //console.log(info);
+    } 
+    if (info.athlete != null && info.athlete.type != null && info.athlete.type !== 'NORMAL') {
+        bgSpecial = 'is-rider-special';
     }
+
+    rowHtml = rowHtml.replace('_bg-special_', bgSpecial);
     rowHtml = rowHtml.replace('_wkg-cur-color_', wkgCurColor);
 
     row.innerHTML = rowHtml;
 }
 
 function createTableRowInnerHtmlO101(withWkgCurColor) {
-    let html = '<td><div class="o101 _is-in-group_ _wkg-cur-color_">';
+    let html = '<td><div class="o101 _bg-special_ _wkg-cur-color_">';
     html += '<div class="row-top"><div class="col-f-last">_f-last_</div><div class="col-team">_team_</div></div>';
     html += '<div class="row-bottom"><div class="col-gap">_gap_</div><div class="col-gap-distance">_gap-distance_</div><div class="col-hr-cur">_hr-cur_</div><div class="col-wkg-cur">_wkg-cur_</div></div>';
     html += '</div></td>';
@@ -772,7 +775,9 @@ function stripSpamFromNameO101(value) {
         }
     }
 
-    value = value.replace(/[0-9]/g, '');
+    value = value.replace(' ', 'SsS');
+    value = value.replace(/[^A-Za-z]/g, '');
+    value = value.replace('SsS', ' ');
 
     return value.trim();
 }
