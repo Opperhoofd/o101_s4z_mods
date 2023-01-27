@@ -16,8 +16,23 @@
         "overlay": true,
         "frame": false,
         "default_bounds": {
-            "width": 800,
-            "height": 800,
+            "width": 600,
+            "height": 250,
+            "x": -300,
+            "y": 100
+        }
+    },
+    {
+        "file": "pages/curwatch-race.html",
+        "id": "O101-curwatch-race",
+        "name": "O101 - currently watching race",
+        "description": "A currently watching window optimized for racing",
+        "always_visible": true,
+        "overlay": true,
+        "frame": false,
+        "default_bounds": {
+            "width": 300,
+            "height": 250,
             "x": -300,
             "y": 100
         }
