@@ -1,53 +1,51 @@
 #o101-main {
-    font-weight: bold;
+    width: 100%;
     display: flex;
     clear: both;
-    width: 100%;
     text-align: right;
+    font-weight: bold;
 }
 
 
 div.row-left {
-    display: inline-block;
-    padding-top: 10px;
+    width: 30%;
+    line-height: 175%;
+    margin-top: 10px;
 }
-div.row-left .value {
-    display: inline-block;
-    width: 105px;
+div.row-left div.item {
+    width: 100%;
     font-size: 125%;
-    line-height: 150%;
 }
 div.row-left .unit {
+    width: 30%;
     display: inline-block;
-    width: 40px;
-    padding-left: 5px;
     font-size: 40%;
     text-align: left;
+    margin-left: 5px;
 }
 
 
 div.row-right {
-    padding-top: 30px;
-    padding-right: 15px;
+    width: 70%;
+    line-height: 175%;
+    margin-top: 25px;
+}
+div.row-right div.item {
     width: 100%;
+    font-size: 350%;
+    font-weight: bolder;
+    margin-top: 15px;
 }
-#cur-power .value {
-    padding-top: 5px;
-    font-size: 325%;
-    line-height: 100%;
-}
-#cur-power .unit {
-    font-size: 40%;
-    padding-left: 5px;
-}
-#cur-draft {
-    padding-top: 10px;
-}
-#cur-draft .value {
-    font-size: 200%;
-    line-height: 100%;
-}
-#cur-draft .unit {
+div.row-right .unit {
+    width: 15%;
+    display: inline-block;
     font-size: 30%;
+    text-align: left;
     padding-left: 5px;
+    font-weight: bold;
+}
+div.row-right #cur-draft {
+    font-size: 250%;
+    font-weight: bold;
+    margin-top: 25px;
 }

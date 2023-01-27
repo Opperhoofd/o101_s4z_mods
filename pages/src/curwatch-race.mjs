@@ -36,5 +36,5 @@ function setValue(id, value, unit) {
         
     if (div == null || value == null) return '&nbsp';
     
-    div.innerHTML = '<span class="value">'+value+'<span><span class="unit">'+unit+'<span>';
+    div.innerHTML = value+'<div class="unit">'+unit+'<div>';
 }
