@@ -6,6 +6,7 @@ const L = sauce.locale;
 const H = L.human;
 const num = H.number;
 const fieldsKey = 'nearby-fields-v2';
+const visibleDataO101 = ['initials','f-last','team','gap','gap-distance','hr-cur','wkg-cur'];
 let imperial = common.storage.get('/imperialUnits');
 L.setImperial(imperial);
 let eventSite = common.storage.get('/externalEventSite', 'zwift');
@@ -27,10 +28,13 @@ common.settingsStore.setDefault({
 
 const unit = x => `<abbr class="unit">${x}</abbr>`;
 const spd = (v, entry) => H.pace(v, {precision: 0, suffix: true, html: true, sport: entry.state.sport});
+const weightClass = v => H.weightClass(v, {suffix: true, html: true});
 const pwr = v => H.power(v, {suffix: true, html: true});
 const hr = v => v ? num(v) + unit('bpm') : '&nbsp;';
+const kj = (v, options) => v != null ? num(v, options) + unit('kJ') : '-';
 const pct = v => (v != null && !isNaN(v) && v !== Infinity && v !== -Infinity) ? num(v) + unit('%') : '-';
 const gapTime = (v, entry) => H.timer(v) + (entry.isGapEst ? '<small> (est)</small>' : ' ');
+
 
 let overlayMode;
 if (window.isElectron) {
@@ -160,22 +164,63 @@ function athleteLink(id, content, options={}) {
                target="_blank">${content || ''}</a>`;
 }
 
+
+function fmtAvatar(name, {athlete, athleteId}) {
+    const url = athlete && athlete.avatar || '/pages/images/fa/user-circle-solid.svg';
+    return athleteLink(athleteId, `<img src="${url}"/>`, {class: 'avatar'});
+}
+
+
+function fmtActions() {
+    return `<a class="link" data-id="watch"
+               title="Watch this athlete"><ms>video_camera_front</ms></a>`;
+}
+
+
 const fieldGroups = [{
     group: 'athlete',
     label: 'Athlete',
-    fields: [        
+    fields: [
+        {id: 'actions', defaultEn: false, label: 'Action Button(s)', headerLabel: ' ', fmt: fmtActions},
+        {id: 'avatar', defaultEn: true, label: 'Avatar', headerLabel: '<ms>account_circle</ms>',
+         get: x => x.athlete && x.athlete.sanitizedFullname, fmt: fmtAvatar},
         {id: 'nation', defaultEn: true, label: 'Country Flag', headerLabel: '<ms>flag</ms>',
          get: x => x.athlete && x.athlete.countryCode, fmt: common.fmtFlag},
+        {id: 'name', defaultEn: true, label: 'Name', get: x => x.athlete && x.athlete.sanitizedFullname,
+         fmt: fmtName},
         {id: 'f-last', defaultEn: false, label: 'F. Last', get: x => x.athlete && x.athlete.fLast,
          fmt: fmtName},
         {id: 'initials', defaultEn: false, label: 'Name Initials', headerLabel: ' ',
          get: x => x.athlete && x.athlete.initials, fmt: fmtName},
         {id: 'team', defaultEn: false, label: 'Team', get: x => x.athlete && x.athlete.team,
          fmt: common.teamBadge},
+        {id: 'weight-class', defaultEn: false, label: 'Weight Class', headerLabel: 'Weight',
+         get: x => x.athlete && x.athlete.weight, fmt: weightClass},
+        {id: 'level', defaultEn: false, label: 'Level', get: x => x.athlete && x.athlete.level,
+         tooltip: 'The Zwift level of this athlete'},
+        {id: 'ftp', defaultEn: false, label: 'FTP', get: x => x.athlete && x.athlete.ftp,
+         fmt: x => x ? pwr(x) : '-', tooltip: 'Functional Threshold Power'},
+        {id: 'cp', defaultEn: false, label: 'CP', get: x => x.athlete && x.athlete.cp,
+         fmt: x => x ? pwr(x) : '-', tooltip: 'Critical Power'},
+        {id: 'tss', defaultEn: false, label: 'TSS', get: x => x.stats.power.tss, fmt: num,
+         tooltip: 'Training Stress Score'},
+        {id: 'intensity-factor', defaultEn: false, label: 'Intensity Factor', headerLabel: 'IF',
+         tootltip: 'Normalized Power / FTP: A value of 100% means NP = FTP', get: x => x.stats.power.np,
+         fmt: (x, entry) => pct(x / (entry.athlete && entry.athlete.ftp) * 100)},
         {id: 'distance', defaultEn: false, label: 'Distance', headerLabel: 'Dist',
          get: x => x.state.distance, fmt: fmtDist},
         {id: 'event-distance', defaultEn: false, label: 'Event Distance', headerLabel: 'Ev Dist',
          get: x => x.state.eventDistance, fmt: fmtDist},
+        {id: 'rideons', defaultEn: false, label: 'Ride Ons', headerLabel: '<ms>thumb_up</ms>',
+         get: x => x.state.rideons, fmt: num},
+        {id: 'kj', defaultEn: false, label: 'Energy (kJ)', headerLabel: 'kJ', get: x => x.state.kj, fmt: kj},
+        {id: 'wprimebal', defaultEn: false, label: 'W\'bal', get: x => x.stats.power.wBal,
+         tooltip: "W' and W'bal represent time above threshold and remaining energy respectively.\n" +
+         "Think of the W'bal value as the amount of energy in a battery.",
+         fmt: (x, entry) => (x != null && entry.athlete && entry.athlete.wPrime) ?
+            common.fmtBattery(x / entry.athlete.wPrime) + kj(x / 1000, {precision: 1}) : '-'},
+        {id: 'power-meter', defaultEn: false, label: 'Power Meter', headerLabel: 'PM',
+         get: x => x.state.powerMeter, fmt: x => x ? '<ms>check</ms>' : ''},
     ],
 }, {
     group: 'event',
@@ -183,6 +228,12 @@ const fieldGroups = [{
     fields: [
         {id: 'gap', defaultEn: true, label: 'Gap', get: x => x.gap, fmt: gapTime},
         {id: 'gap-distance', defaultEn: false, label: 'Gap (dist)', get: x => x.gapDistance, fmt: fmtDist},
+        {id: 'game-laps', defaultEn: false, label: 'Game Lap', headerLabel: 'Z Lap',
+         get: x => x.state.laps + 1, fmt: num},
+        {id: 'sauce-laps', defaultEn: false, label: 'Sauce Lap', headerLabel: 'S Lap',
+         get: x => x.lapCount, fmt: num},
+        {id: 'remaining', defaultEn: false, label: 'Event/Route Remaining', headerLabel: '<ms>sports_score</ms>',
+         get: x => x.remaining, fmt: (v, entry) => entry.remainingMetric === 'distance' ? fmtDist(v) : fmtDur(v)},
         {id: 'position', defaultEn: false, label: 'Event Position', headerLabel: 'Pos',
          get: x => x.eventPosition, fmt: num},
         {id: 'event', defaultEn: false, label: 'Event', headerLabel: '<ms>event</ms>',
@@ -191,6 +242,11 @@ const fieldGroups = [{
          get: getRoute, fmt: fmtRoute},
         {id: 'progress', defaultEn: false, label: 'Route %', headerLabel: 'RT %',
          get: x => x.state.progress * 100, fmt: pct},
+        {id: 'workout-zone', defaultEn: false, label: 'Workout Zone', headerLabel: 'Zone',
+         get: x => x.state.workoutZone, fmt: x => x || '-'},
+        {id: 'road', defaultEn: false, label: 'Road ID', get: x => x.state.roadId},
+        {id: 'roadcom', defaultEn: false, label: 'Road Completion', headerLabel: 'Road %',
+         get: x => x.state.roadCompletion / 10000, fmt: pct},
     ],
 }, {
     group: 'power',
@@ -200,6 +256,45 @@ const fieldGroups = [{
          get: x => x.state.power, fmt: pwr},
         {id: 'wkg-cur', defaultEn: true, label: 'Current Watts/kg', headerLabel: 'W/kg',
          get: x => x.state.power, fmt: fmtWkg},
+        {id: 'pwr-5s', defaultEn: false, label: '5s average', headerLabel: 'Pwr (5s)',
+         get: x => x.stats.power.smooth[5], fmt: pwr},
+        {id: 'wkg-5s', defaultEn: false, label: '5s average (w/kg)', headerLabel: 'W/kg (5s)',
+         get: x => x.stats.power.smooth[5], fmt: fmtWkg},
+        {id: 'pwr-15s', defaultEn: false, label: '15 sec average', headerLabel: 'Pwr (15s)',
+         get: x => x.stats.power.smooth[15], fmt: pwr},
+        {id: 'wkg-15s', defaultEn: false, label: '15 sec average (w/kg)', headerLabel: 'W/kg (15s)',
+         get: x => x.stats.power.smooth[15], fmt: fmtWkg},
+        {id: 'pwr-60s', defaultEn: false, label: '1 min average', headerLabel: 'Pwr (1m)',
+         get: x => x.stats.power.smooth[60], fmt: pwr},
+        {id: 'wkg-60s', defaultEn: false, label: '1 min average (w/kg', headerLabel: 'W/kg (1m)',
+         get: x => x.stats.power.smooth[60], fmt: fmtWkg},
+        {id: 'pwr-300s', defaultEn: false, label: '5 min average', headerLabel: 'Pwr (5m)',
+         get: x => x.stats.power.smooth[300], fmt: pwr},
+        {id: 'wkg-300s', defaultEn: false, label: '5 min average (w/kg)', headerLabel: 'W/kg (5m)',
+         get: x => x.stats.power.smooth[300], fmt: fmtWkg},
+        {id: 'pwr-1200s', defaultEn: false, label: '20 min average', headerLabel: 'Pwr (20m)',
+         get: x => x.stats.power.smooth[1200], fmt: pwr},
+        {id: 'wkg-1200s', defaultEn: false, label: '20 min average (w/kg)', headerLabel: 'W/kg (20m)',
+         get: x => x.stats.power.smooth[1200], fmt: fmtWkg},
+        {id: 'pwr-avg', defaultEn: true, label: 'Total Average', headerLabel: 'Pwr (avg)',
+         get: x => x.stats.power.avg, fmt: pwr},
+        {id: 'wkg-avg', defaultEn: false, label: 'Total W/kg Average', headerLabel: 'W/kg (avg)',
+         get: x => x.stats.power.avg, fmt: fmtWkg},
+        {id: 'pwr-np', defaultEn: true, label: 'NP', headerLabel: 'NP',
+         get: x => x.stats.power.np, fmt: pwr},
+        {id: 'wkg-np', defaultEn: false, label: 'NP (w/kg)', headerLabel: 'NP (w/kg)',
+         get: x => x.stats.power.np, fmt: fmtWkg},
+        {id: 'pwr-vi', defaultEn: true, label: 'Variability Index', headerLabel: 'VI',
+         get: x => x.stats.power.np / x.stats.power.avg, tooltip: 'NP / Avg-Power',
+         fmt: x => num(x, {precision: 2, fixed: true})},
+        {id: 'power-lap', defaultEn: false, label: 'Lap Average', headerLabel: 'Pwr (lap)',
+         get: x => x.lap.power.avg, fmt: pwr},
+        {id: 'wkg-lap', defaultEn: false, label: 'Lap W/kg Average', headerLabel: 'W/kg (lap)',
+         get: x => x.lap.power.avg, fmt: fmtWkg},
+        {id: 'power-last-lap', defaultEn: false, label: 'Last Lap Average', headerLabel: 'Pwr (last)',
+         get: x => x.lastLap ? x.lastLap.power.avg : null, fmt: pwr},
+        {id: 'wkg-last-lap', defaultEn: false, label: 'Last Lap W/kg Average', headerLabel: 'W/kg (last)',
+         get: x => x.lastLap ? x.lastLap.power.avg : null, fmt: fmtWkg},
     ],
 }, {
     group: 'speed',
@@ -207,8 +302,18 @@ const fieldGroups = [{
     fields: [
         {id: 'spd-cur', defaultEn: true, label: 'Current Speed', headerLabel: 'Spd',
          get: x => x.state.speed, fmt: spd},
+        {id: 'spd-60s', defaultEn: false, label: '1 min average', headerLabel: 'Spd (1m)',
+         get: x => x.stats.speed.smooth[60], fmt: spd},
+        {id: 'spd-300s', defaultEn: false, label: '5 min average', headerLabel: 'Spd (5m)',
+         get: x => x.stats.speed.smooth[300], fmt: spd},
+        {id: 'spd-1200s', defaultEn: false, label: '20 min average', headerLabel: 'Spd (20m)',
+         get: x => x.stats.speed.smooth[1200], fmt: spd},
         {id: 'spd-avg', defaultEn: true, label: 'Total Average', headerLabel: 'Spd (avg)',
          get: x => x.stats.speed.avg, fmt: spd},
+        {id: 'speed-lap', defaultEn: false, label: 'Lap Average', headerLabel: 'Spd (lap)',
+         get: x => x.lap.speed.avg, fmt: spd},
+        {id: 'speed-last-lap', defaultEn: false, label: 'Last Lap Average', headerLabel: 'Spd (last)',
+         get: x => x.lastLap ? x.lastLap.speed.avg : null, fmt: spd},
     ],
 }, {
     group: 'hr',
@@ -216,8 +321,18 @@ const fieldGroups = [{
     fields: [
         {id: 'hr-cur', defaultEn: true, label: 'Current Heart Rate', headerLabel: 'HR',
          get: x => x.state.heartrate || null, fmt: hr},
+        {id: 'hr-60s', defaultEn: false, label: '1 min average', headerLabel: 'HR (1m)',
+         get: x => x.stats.hr.smooth[60], fmt: hr},
+        {id: 'hr-300s', defaultEn: false, label: '5 min average', headerLabel: 'HR (5m)',
+         get: x => x.stats.hr.smooth[300], fmt: hr},
+        {id: 'hr-1200s', defaultEn: false, label: '20 min average', headerLabel: 'HR (20m)',
+         get: x => x.stats.hr.smooth[1200], fmt: hr},
         {id: 'hr-avg', defaultEn: true, label: 'Total Average', headerLabel: 'HR (avg)',
          get: x => x.stats.hr.avg, fmt: hr},
+        {id: 'hr-lap', defaultEn: false, label: 'Lap Average', headerLabel: 'HR (lap)',
+         get: x => x.lap.hr.avg, fmt: hr},
+        {id: 'hr-last-lap', defaultEn: false, label: 'Last Lap Average', headerLabel: 'HR (last)',
+         get: x => x.lastLap ? x.lastLap.hr.avg : null, fmt: hr},
     ],
 }, {
     group: 'draft',
@@ -233,8 +348,45 @@ const fieldGroups = [{
          get: x => x.stats.draft.smooth[1200], fmt: pct},
         {id: 'draft-avg', defaultEn: false, label: 'Total Average', headerLabel: 'Draft (avg)',
          get: x => x.stats.draft.avg, fmt: pct},
+        {id: 'draft-lap', defaultEn: false, label: 'Lap Average', headerLabel: 'Draft (lap)',
+         get: x => x.lap.draft.avg, fmt: pct},
+        {id: 'draft-last-lap', defaultEn: false, label: 'Last Lap Average', headerLabel: 'Draft (last)',
+         get: x => x.lastLap ? x.lastLap.draft.avg : null, fmt: pct},
     ],
 
+}, {
+    group: 'peaks',
+    label: 'Peak Performances',
+    fields: [
+        {id: 'pwr-max', defaultEn: true, label: 'Power Max', headerLabel: 'Pwr (max)',
+         get: x => x.stats.power.max || null, fmt: pwr},
+        {id: 'wkg-max', defaultEn: false, label: 'Watts/kg Max', headerLabel: 'W/kg (max)',
+         get: x => x.stats.power.max || null, fmt: fmtWkg},
+        {id: 'pwr-p5s', defaultEn: false, label: 'Power 5 sec peak', headerLabel: 'Pwr (peak 5s)',
+         get: x => x.stats.power.peaks[5].avg, fmt: pwr},
+        {id: 'wkg-p5s', defaultEn: false, label: 'Watts/kg 5 sec peak', headerLabel: 'W/kg (peak 5s)',
+         get: x => x.stats.power.peaks[5].avg, fmt: fmtWkg},
+        {id: 'pwr-p15s', defaultEn: false, label: 'Power 15 sec peak', headerLabel: 'Pwr (peak 15s)',
+         get: x => x.stats.power.peaks[15].avg, fmt: pwr},
+        {id: 'wkg-p15s', defaultEn: false, label: 'Watts/kg 15 sec peak', headerLabel: 'W/kg (peak 15s)',
+         get: x => x.stats.power.peaks[15].avg, fmt: fmtWkg},
+        {id: 'pwr-p60s', defaultEn: false, label: 'Power 1 min peak', headerLabel: 'Pwr (peak 1m)',
+         get: x => x.stats.power.peaks[60].avg, fmt: pwr},
+        {id: 'wkg-p60s', defaultEn: false, label: 'Watts/kg 1 min peak', headerLabel: 'W/kg (peak 1m)',
+         get: x => x.stats.power.peaks[60].avg, fmt: fmtWkg},
+        {id: 'pwr-p300s', defaultEn: true, label: 'Power 5 min peak', headerLabel: 'Pwr (peak 5m)',
+         get: x => x.stats.power.peaks[300].avg, fmt: pwr},
+        {id: 'wkg-p300s', defaultEn: false, label: 'Watts/kg 5 min peak', headerLabel: 'W/kg (peak 5m)',
+         get: x => x.stats.power.peaks[300].avg, fmt: fmtWkg},
+        {id: 'pwr-p1200s', defaultEn: false, label: 'Power 20 min peak', headerLabel: 'Pwr (peak 20m)',
+         get: x => x.stats.power.peaks[1200].avg, fmt: pwr},
+        {id: 'wkg-p1200s', defaultEn: false, label: 'Watts/kg 20 min peak', headerLabel: 'W/kg (peak 20m)',
+         get: x => x.stats.power.peaks[1200].avg, fmt: fmtWkg},
+        {id: 'spd-p60s', defaultEn: false, label: 'Speed 1 min peak', headerLabel: 'Spd (peak 1m)',
+         get: x => x.stats.speed.peaks[60].avg, fmt: spd},
+        {id: 'hr-p60s', defaultEn: false, label: 'Heart Rate 1 min peak', headerLabel: 'HR (peak 1m)',
+         get: x => x.stats.hr.peaks[60].avg, fmt: hr},
+    ],
 }, {
     group: 'debug',
     label: 'Debug',
@@ -477,7 +629,7 @@ export async function settingsMain() {
                 ...fields.map(x => `
                     <label title="${common.sanitizeAttr(x.tooltip || '')}">
                         <key>${x.label}</key>
-                        <input type="checkbox" name="${x.id}" ${visibleDataO101.includes(x.id) ? 'checked' : ''}/>
+                        <input type="checkbox" name="${x.id}" ${fieldStates[x.id] ? 'checked' : ''}/>
                     </label>
                 `),
             '</div>'
@@ -486,7 +638,6 @@ export async function settingsMain() {
     await common.initSettingsForm('form#options')();
 }
 
-const visibleDataO101 = ['initials','f-last','team','gap','gap-distance','hr-cur','wkg-cur'];
 
 function updateTableRowO101(row, info) {
     if (row.title && !gameConnection) {
@@ -554,7 +705,7 @@ function updateTableRowO101(row, info) {
                 wkgCurColor = 'col-wkg-cur-purple';
             }
         }
-        
+
         rowHtml = rowHtml.replace('_'+visibleDataO101.indexOf(id), html);
     }
 
