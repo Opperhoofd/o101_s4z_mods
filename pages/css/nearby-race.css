@@ -102,6 +102,10 @@ div .o101-head {
   line-height: 125%;
 }
 
+div .o101 {
+  background-color: #101010;
+}
+
 div .o101 .row-top, div .o101 .row-bottom {
   display: flex;
   clear: both;
@@ -155,24 +159,21 @@ div .o101 .col-wkg-cur {
   font-weight: bold;
 }
 
-.is-rider-in-group {
-  background-color: #000;
+.rider-in-group {
+  background-color: #000 !important;
 }
-.is-rider-out-of-group {
-  background-color: #101010;
+.rider-me {
+  background-color: #1192cc !important;
 }
-.is-rider-me {
-  background-color: #1192cc;
+.rider-special {
+  background-color: #f36d3f !important;
 }
-.is-rider-special {
-  background-color: #f36d3f;
-}
-.col-wkg-cur-orange {
+.wkg-orange {
   color: orange;
 }
-.col-wkg-cur-red {
+.wkg-red {
   color: red;
 }
-.col-wkg-cur-purple {
+.wkg-purple {
   color: purple;
 }

@@ -5,6 +5,8 @@ const doc = document.documentElement;
 const fieldsKey = 'nearby-fields-v2';
 const unit = x => `<abbr class="unit">${x}</abbr>`;
 const lazyGetSubgroup = makeLazyGetter(id => common.rpc.getEventSubgroup(id));
+const topRowsToUpdate = 10;
+const bottomRowsToUpdate = 10;
 
 let fieldStates;
 let nearbyData;
@@ -24,7 +26,6 @@ common.settingsStore.setDefault({
     fontScale: 1,
     solidBackground: false,
     backgroundColor: '#00ff00',
-    rowsToUpdate: 20,
 });
 
 if (window.isElectron) {
@@ -197,7 +198,7 @@ function renderData(data, {recenter}={}) {
     const centerIdx = data.findIndex(x => x.watching);
     const watchingRow = tbody.querySelector('tr.watching') || tbody.appendChild(createTableRow());
     let row = watchingRow;
-    for (let i = centerIdx; i >= 0; i--) {
+    for (let i = centerIdx; i >= 0 && i > centerIdx-topRowsToUpdate; i--) {
         updateTableRow(row, data[i]);
         if (i) {
             row = row.previousElementSibling || row.insertAdjacentElement('beforebegin', createTableRow());
@@ -208,7 +209,7 @@ function renderData(data, {recenter}={}) {
         gentleClassToggle(row = row.previousElementSibling, 'hidden', true);
     }
     row = watchingRow;
-    for (let i = centerIdx + 1; i < data.length && i; i++) {
+    for (let i = centerIdx + 1; i < data.length && i <= centerIdx+bottomRowsToUpdate; i++) {
         row = row.nextElementSibling || row.insertAdjacentElement('afterend', createTableRow());
         updateTableRow(row, data[i]);
         gentleClassToggle(row, 'hidden', false);
@@ -264,14 +265,14 @@ function updateTableRow(row, info) {
     rowHtml = rowHtml.replace('_5', fmtHeartrate(info.state.heartrate));
     rowHtml = rowHtml.replace('_6', fmtWkg(info));
 
-    rowHtml = rowHtml.replace('_bg-special_', getBackgroundClass(info));
-    rowHtml = rowHtml.replace('_wkg-cur-color_', getWkgClass(info));
+    rowHtml = rowHtml.replace('_bg', getBackgroundClass(info));
+    rowHtml = rowHtml.replace('_wkg', getWkgClass(info));
 
     row.innerHTML = rowHtml;
 }
 
 function createTableRowInnerHtml() {
-    let html = '<td><div class="o101 _bg-special_ _wkg-cur-color_">';
+    let html = '<td><div class="o101_bg_wkg">';
     html += '<div class="row-top"><div class="col-f-last">_1</div><div class="col-team">_2</div></div>';
     html += '<div class="row-bottom"><div class="col-gap">_3</div><div class="col-gap-distance">_4</div><div class="col-hr-cur">_5</div><div class="col-wkg-cur">_6</div></div>';
     html += '</div></td>';
@@ -374,15 +375,15 @@ function getCategoryBadge(info) {
 }
 
 function getBackgroundClass(info) {
-    let bgClass = 'is-rider-out-of-group';
+    let bgClass = '';
 
     if ((info.gap > -1 && info.gap < 1)) {
-        bgClass = info.watching === true ? 'is-rider-me' : 'is-rider-in-group';
+        bgClass = info.watching === true ? ' rider-me' : ' rider-in-group';
     } 
     if (info.athlete != null && info.athlete.type != null && info.athlete.type == '10') {
         // info.athlete.type: NORMAL|PRO_CYCLIST
         // pace partner == 10?
-        bgClass = 'is-rider-special';
+        bgClass = ' rider-special';
     }
 
     return bgClass;
@@ -390,14 +391,16 @@ function getBackgroundClass(info) {
 function getWkgClass(info) {
     let wkg = info.state.power / (info.athlete && info.athlete.weight);
     if (wkg>=5) {
-        return 'col-wkg-cur-orange';
+        return ' wkg-orange';
     }
     if (wkg>=8) {
-        return 'col-wkg-cur-red';
+        return ' wkg-red';
     }
     if (wkg>=11) {
-        return 'col-wkg-cur-purple';
+        return ' wkg-purple';
     }
+
+    return '';
 }
 
 function gentleClassToggle(el, cls, force) {
