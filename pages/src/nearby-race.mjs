@@ -260,9 +260,9 @@ function updateTableRow(row, info) {
 
     rowHtml = rowHtml.replace('_1', getCategoryBadge(info) + fmtName(info));
     rowHtml = rowHtml.replace('_2', fmtTeamName(info));
-    rowHtml = rowHtml.replace('_3', fmtGapTime(info.gap));
-    rowHtml = rowHtml.replace('_4', fmtGapDistance(info.gapDistance));
-    rowHtml = rowHtml.replace('_5', fmtHeartrate(info.state.heartrate));
+    rowHtml = rowHtml.replace('_3', fmtGapTime(info));
+    rowHtml = rowHtml.replace('_4', fmtGapDistance(info));
+    rowHtml = rowHtml.replace('_5', fmtHeartrate(info));
     rowHtml = rowHtml.replace('_6', fmtWkg(info));
 
     rowHtml = rowHtml.replace('_bg', getBackgroundClass(info));
@@ -274,7 +274,7 @@ function updateTableRow(row, info) {
 function createTableRowInnerHtml() {
     let html = '<td><div class="o101_bg_wkg">';
     html += '<div class="row-top"><div class="col-f-last">_1</div><div class="col-team">_2</div></div>';
-    html += '<div class="row-bottom"><div class="col-gap">_3</div><div class="col-gap-distance">_4</div><div class="col-hr-cur">_5</div><div class="col-wkg-cur">_6</div></div>';
+    html += '<div class="row-bottom"><div class="col-gap">_3</div><div class="col-gap-distance">_4</div><div class="col-hr-cur">_5</div><div class="col-wkg-cur">_6</div><div class="col-wkg-cur-unit">W/kg</div></div>';
     html += '</div></td>';
     return html;
 }
@@ -311,12 +311,12 @@ function fmtTeamName(info) {
         ? common.teamBadge(info.athlete.team)
         : '';
 }
-function fmtGapTime(value) {
-    if (value > -1 && value < 1) {
+function fmtGapTime(info) {
+    if (isInGroup(info)) {
         return '';
     } 
     
-    var time = sauce.locale.human.timer(value);
+    var time = sauce.locale.human.timer(info.gap);
     var prefix = (time+'').indexOf('-')<0 ? '+' : '-';
     
     time = time.replace('-', '');
@@ -327,11 +327,12 @@ function fmtGapTime(value) {
 
     return prefix + time;
 }
-function fmtGapDistance(value) {
+function fmtGapDistance(info) {
     let distance = ''
+    const value = info.gapDistance;
 
-    if ((value == null || value === Infinity || value === -Infinity || isNaN(value) || (value > -5 && value < 5))) {
-        return '';
+    if ((value == null || value === Infinity || value === -Infinity || isNaN(value) || isInGroup(info))) {
+        return distance;
     } else if (Math.abs(value) < 1000) {
         const suffix = unit(imperial ? 'ft' : 'm');
         distance = sauce.locale.human.number(imperial ? value / L.metersPerFoot : value) + suffix;
@@ -341,13 +342,14 @@ function fmtGapDistance(value) {
 
     return distance.replace('-', '')
 }
-function fmtHeartrate(value) {
-    return (value == null || value == 0) ? '' : value + ' bpm';
+function fmtHeartrate(info) {
+    const value = info.state.heartrate;
+    return (value == null || value == 0) ? '' : '&#9829; ' + value;
 }
 function fmtWkg(info) {
     let wkg = info.state.power / (info.athlete && info.athlete.weight);
     
-    return sauce.locale.human.number(wkg, {precision: 1, fixed: true}) + ' W/kg'
+    return sauce.locale.human.number(wkg, {precision: 1, fixed: true});
 }
 
 function stripSpamFromName(value) {
@@ -361,6 +363,11 @@ function stripSpamFromName(value) {
     }
 
     return value;
+}
+
+function isInGroup(info) {
+    const value = info.gap;
+    return (value > -1 && value < 1);
 }
 
 function getCategoryBadge(info) {
