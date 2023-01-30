@@ -1,21 +1,5 @@
-html.solid-background {
-  background: var(--background-color);
-}
-html.solid-background body {
-  background: transparent !important;
-}
-
-html:not(.overlay-mode) .overlay-only {
-  display: none !important;
-}
-
-html {
-  font-size: 4mm;
-}
-
-html:not(.game-connection) table td .link[data-id=watch] {
-  opacity: 0.2;
-  pointer-events: none;
+.noHUD {
+  background: rgba(0, 0, 0, 0.4) !important;
 }
 
 table {
@@ -31,10 +15,8 @@ table tr {
   --data-index: 0;
   --height: 2.6em;
   height: var(--height);
-  transition: background 100ms;
 }
 table tr.hiding {
-  background-color: rgba(186, 188, 1, 0.8705882353);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -43,7 +25,6 @@ table tr.hidden {
   display: none;
 }
 table td {
-  transition: background 100ms;
   text-align: left;
   padding: 0.18em 0.3em;
   font-variant: tabular-nums;
@@ -100,10 +81,6 @@ div .o101-head {
   position: sticky;
   top: 0;
   line-height: 125%;
-}
-
-div .o101 {
-  background-color: #101010;
 }
 
 div .o101 .row-top, div .o101 .row-bottom {
@@ -166,13 +143,22 @@ div .o101 .col-wkg-cur-unit {
 }
 
 .rider-in-group {
-  background-color: #000 !important;
+  /*background: rgb(0, 0, 0) !important;*/
+}
+.rider-in-group-nohud {
+  background: rgba(0, 0, 0, 0.6) !important;
 }
 .rider-me {
-  background-color: #1192cc !important;
+  background: rgb(17, 146, 204) !important;
+}
+.rider-me-nohud {
+  background: rgba(17, 146, 204, 0.4) !important;
 }
 .rider-special {
-  background-color: #f36d3f !important;
+  background: rgb(243, 109, 63) !important;
+}
+.rider-special-nohud {
+  background: rgba(243, 109, 63, 0.4) !important;
 }
 .wkg-orange {
   color: orange;

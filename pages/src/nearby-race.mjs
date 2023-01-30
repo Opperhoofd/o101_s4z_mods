@@ -64,6 +64,7 @@ function makeLazyGetter(cb) {
 
 export async function main() {
     common.initInteractionListeners();
+    common.settingsStore.set('noHUD', false);
     let onlyMarked = common.settingsStore.get('onlyMarked');
     let onlySameCategory= common.settingsStore.get('onlySameCategory');
     let onlySameTeam= common.settingsStore.get('onlySameTeam');
@@ -101,8 +102,7 @@ export async function main() {
         }
         if (changed.has('onlySameTeam')) {
             onlySameTeam = changed.get('onlySameTeam');
-        }        
-
+        }
         render();
         if (nearbyData) {
             renderData(nearbyData);
@@ -184,8 +184,19 @@ async function watchAthlete(athleteId) {
 
 
 function render() {
+    const body = document.querySelector('body');
+
+    if (common.settingsStore.get('noHUD')) {
+        body.classList.add('noHUD');
+        console.log('add noHUD');
+    } else {
+        body.classList.remove('noHUD');
+        console.log(common.settingsStore.get('noHUD') + 'remove noHUD');
+    }
+
     doc.classList.toggle('autoscroll', common.settingsStore.get('autoscroll'));
     doc.style.setProperty('--font-scale', common.settingsStore.get('fontScale') || 1);
+
     table = document.querySelector('#content table');
     tbody = table.querySelector('tbody');
     tbody.innerHTML = '';
@@ -391,6 +402,9 @@ function getBackgroundClass(info) {
         // info.athlete.type: NORMAL|PRO_CYCLIST
         // pace partner == 10?
         bgClass = ' rider-special';
+    }
+    if (bgClass != '' && common.settingsStore.get('noHUD')) {
+        bgClass += '-nohud';
     }
 
     return bgClass;
