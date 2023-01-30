@@ -21,7 +21,7 @@ sauce.locale.setImperial(imperial);
 
 common.settingsStore.setDefault({
     autoscroll: true,
-    refreshInterval: 2,
+    refreshInterval: 1,
     overlayMode: false,
     fontScale: 1,
     solidBackground: false,
