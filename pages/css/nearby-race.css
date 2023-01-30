@@ -1,21 +1,5 @@
-html.solid-background {
-  background: var(--background-color);
-}
-html.solid-background body {
-  background: transparent !important;
-}
-
-html:not(.overlay-mode) .overlay-only {
-  display: none !important;
-}
-
-html {
-  font-size: 4mm;
-}
-
-html:not(.game-connection) table td .link[data-id=watch] {
-  opacity: 0.2;
-  pointer-events: none;
+.noHUD {
+  background: rgba(0, 0, 0, 0.4) !important;
 }
 
 table {
@@ -31,10 +15,8 @@ table tr {
   --data-index: 0;
   --height: 2.6em;
   height: var(--height);
-  transition: background 100ms;
 }
 table tr.hiding {
-  background-color: rgba(186, 188, 1, 0.8705882353);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -43,7 +25,6 @@ table tr.hidden {
   display: none;
 }
 table td {
-  transition: background 100ms;
   text-align: left;
   padding: 0.18em 0.3em;
   font-variant: tabular-nums;
@@ -138,41 +119,53 @@ div .o101 .row-bottom {
 div .o101 .col-gap {
   width: 20%;
   text-align: left;
-  margin-left: 5px;
+  margin-left: 0%;
 }
 div .o101 .col-gap-distance {
+  color: lightgrey;
   width: 80%;
   text-align: left;
-  padding-left: 10px;
+  padding-left: 3%;
 }
 div .o101 .col-hr-cur {
+  color: lightgrey;
   text-align: right;
-  padding-right: 10px;
+  padding-right: 3%;
 }
 div .o101 .col-wkg-cur {
   text-align: right;
   font-size: larger;
   font-weight: bold;
 }
+div .o101 .col-wkg-cur-unit {
+  text-align: right;
+  padding-left: 1%;
+}
 
-.is-rider-in-group {
-  background-color: #000;
+.rider-in-group {
+  /*background: rgb(0, 0, 0) !important;*/
 }
-.is-rider-out-of-group {
-  background-color: #101010;
+.rider-in-group-nohud {
+  background: rgba(0, 0, 0, 0.6) !important;
 }
-.is-rider-me {
-  background-color: #1192cc;
+.rider-me {
+  background: rgb(17, 146, 204) !important;
 }
-.is-rider-special {
-  background-color: #f36d3f;
+.rider-me-nohud {
+  background: rgba(17, 146, 204, 0.4) !important;
 }
-.col-wkg-cur-orange {
+.rider-special {
+  background: rgb(243, 109, 63) !important;
+}
+.rider-special-nohud {
+  background: rgba(243, 109, 63, 0.4) !important;
+}
+.wkg-orange {
   color: orange;
 }
-.col-wkg-cur-red {
+.wkg-red {
   color: red;
 }
-.col-wkg-cur-purple {
+.wkg-purple {
   color: purple;
 }
