@@ -153,10 +153,8 @@ function render() {
 
     if (common.settingsStore.get('noHUD')) {
         body.classList.add('noHUD');
-        console.log('add noHUD');
     } else {
         body.classList.remove('noHUD');
-        console.log(common.settingsStore.get('noHUD') + 'remove noHUD');
     }
 
     doc.classList.toggle('autoscroll', common.settingsStore.get('autoscroll'));
