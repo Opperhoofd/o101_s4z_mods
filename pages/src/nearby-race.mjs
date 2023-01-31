@@ -2,22 +2,15 @@ import * as sauce from '/pages/src/../../shared/sauce/index.mjs';
 import * as common from '/pages/src/common.mjs';
 
 const doc = document.documentElement;
-const fieldsKey = 'nearby-fields-v2';
-const unit = x => `<abbr class="unit">${x}</abbr>`;
+const fieldsKey = 'nearby-race-fields-v2';
 const lazyGetSubgroup = makeLazyGetter(id => common.rpc.getEventSubgroup(id));
-const topRowsToUpdate = 10;
-const bottomRowsToUpdate = 10;
 
 let fieldStates;
 let nearbyData;
-let table;
 let tbody;
 let gameConnection;
 let frames = 0;
 let overlayMode;
-let imperial = common.storage.get('/imperialUnits');
-
-sauce.locale.setImperial(imperial);
 
 common.settingsStore.setDefault({
     autoscroll: true,
@@ -26,6 +19,7 @@ common.settingsStore.setDefault({
     fontScale: 1,
     solidBackground: false,
     backgroundColor: '#00ff00',
+    ridersToUpdate: 20,
 });
 
 if (window.isElectron) {
@@ -65,9 +59,6 @@ function makeLazyGetter(cb) {
 export async function main() {
     common.initInteractionListeners();
     common.settingsStore.set('noHUD', false);
-    let onlyMarked = common.settingsStore.get('onlyMarked');
-    let onlySameCategory= common.settingsStore.get('onlySameCategory');
-    let onlySameTeam= common.settingsStore.get('onlySameTeam');
     let refresh;
     const setRefresh = () => {
         refresh = (common.settingsStore.get('refreshInterval') || 0) * 1000 - 100; // within 100ms is fine.
@@ -93,15 +84,6 @@ export async function main() {
         }
         if (changed.has('refreshInterval')) {
             setRefresh();
-        }
-        if (changed.has('onlyMarked')) {
-            onlyMarked = changed.get('onlyMarked');
-        }
-        if (changed.has('onlySameCategory')) {
-            onlySameCategory = changed.get('onlySameCategory');
-        }
-        if (changed.has('onlySameTeam')) {
-            onlySameTeam = changed.get('onlySameTeam');
         }
         render();
         if (nearbyData) {
@@ -131,23 +113,6 @@ export async function main() {
     setRefresh();
     let lastRefresh = 0;
     common.subscribe('nearby', data => {
-        if (onlyMarked) {
-            data = data.filter(x => x.watching || (x.athlete && x.athlete.marked));
-        }
-        if (onlySameCategory) {
-            const watching = data.find(x => x.watching);
-            const sgid = watching && watching.state.eventSubgroupId;
-            if (sgid) {
-                data = data.filter(x => x.state.eventSubgroupId === sgid);
-            }
-        }
-        if (onlySameTeam) {
-            const watching = data.find(x => x.watching);
-            const team = watching && watching.athlete.team;
-            if (team) {
-                data = data.filter(x => x.athlete && (x.athlete.team === team));
-            }            
-        }
         nearbyData = data;
         const elapsed = Date.now() - lastRefresh;
         if (elapsed >= refresh) {
@@ -197,36 +162,37 @@ function render() {
     doc.classList.toggle('autoscroll', common.settingsStore.get('autoscroll'));
     doc.style.setProperty('--font-scale', common.settingsStore.get('fontScale') || 1);
 
-    table = document.querySelector('#content table');
-    tbody = table.querySelector('tbody');
+    tbody = document.querySelector('#content table tbody');
     tbody.innerHTML = '';
 }
 
 function renderData(data, {recenter}={}) {
+    let ridersToUpdate = common.settingsStore.get('ridersToUpdate');
+
     if (!data || !data.length || document.hidden) {
         return;
     }
     const centerIdx = data.findIndex(x => x.watching);
     const watchingRow = tbody.querySelector('tr.watching') || tbody.appendChild(createTableRow());
     let row = watchingRow;
-    for (let i = centerIdx; i >= 0 && i > centerIdx-topRowsToUpdate; i--) {
+    for (let i = centerIdx; i >= 0 && i > centerIdx-ridersToUpdate/2; i--) {
         updateTableRow(row, data[i]);
         if (i) {
             row = row.previousElementSibling || row.insertAdjacentElement('beforebegin', createTableRow());
-            gentleClassToggle(row, 'hidden', false);
+            toggleElementClass(row, 'hidden', false);
         }
     }
     while (row.previousElementSibling) {
-        gentleClassToggle(row = row.previousElementSibling, 'hidden', true);
+        toggleElementClass(row = row.previousElementSibling, 'hidden', true);
     }
     row = watchingRow;
-    for (let i = centerIdx + 1; i < data.length && i <= centerIdx+bottomRowsToUpdate; i++) {
+    for (let i = centerIdx + 1; i < data.length && i <= centerIdx+ridersToUpdate/2; i++) {
         row = row.nextElementSibling || row.insertAdjacentElement('afterend', createTableRow());
         updateTableRow(row, data[i]);
-        gentleClassToggle(row, 'hidden', false);
+        toggleElementClass(row, 'hidden', false);
     }
     while (row.nextElementSibling) {
-        gentleClassToggle(row = row.nextElementSibling, 'hidden', true);
+        toggleElementClass(row = row.nextElementSibling, 'hidden', true);
     }
     if ((!frames++ || recenter) && common.settingsStore.get('autoscroll')) {
         requestAnimationFrame(() => {            
@@ -256,15 +222,10 @@ function createTableRow() {
 }
 
 function updateTableRow(row, info) {       
-    gentleClassToggle(row, 'watching', info.watching);
+    toggleElementClass(row, 'watching', info.watching);
     
     if (row.dataset.id !== '' + info.athleteId) {
         row.dataset.id = info.athleteId;
-    }
-    
-    if (!common.settingsStore.get('onlySameTeam')) {
-        gentleClassToggle(row, 'marked', info.athlete && info.athlete.marked);
-        gentleClassToggle(row, 'following', info.athlete && info.athlete.following);
     }
 
     let rowHtml = createTableRowInnerHtml();
@@ -345,8 +306,7 @@ function fmtGapDistance(info) {
     if ((value == null || value === Infinity || value === -Infinity || isNaN(value) || isInGroup(info))) {
         return distance;
     } else if (Math.abs(value) < 1000) {
-        const suffix = unit(imperial ? 'ft' : 'm');
-        distance = sauce.locale.human.number(imperial ? value / L.metersPerFoot : value) + suffix;
+        distance = sauce.locale.human.number(value) + 'm';
     } else {
         distance = sauce.locale.human.distance(value, {precision: 1, suffix: true, html: true});
     }
@@ -424,7 +384,7 @@ function getWkgClass(info) {
     return '';
 }
 
-function gentleClassToggle(el, cls, force) {
+function toggleElementClass(el, cls, force) {
     const has = el.classList.contains(cls);
     if (has && !force) {
         el.classList.remove(cls);
