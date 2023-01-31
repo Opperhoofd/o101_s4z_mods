@@ -1,3 +1,7 @@
+.noHUD {
+    background: rgba(0, 0, 0, 0.5) !important;
+}
+
 #o101-main {
     width: 100%;
     display: flex;
