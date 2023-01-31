@@ -1,5 +1,5 @@
 .noHUD {
-  background: rgba(0, 0, 0, 0.4) !important;
+  background: rgba(0, 0, 0, 0.5) !important;
 }
 
 table {
@@ -146,19 +146,19 @@ div .o101 .col-wkg-cur-unit {
   /*background: rgb(0, 0, 0) !important;*/
 }
 .rider-in-group-nohud {
-  background: rgba(0, 0, 0, 0.6) !important;
+  /*background: rgba(0, 0, 0, 0.4) !important;*/
 }
 .rider-me {
   background: rgb(17, 146, 204) !important;
 }
 .rider-me-nohud {
-  background: rgba(17, 146, 204, 0.4) !important;
+  background: rgba(17, 146, 204, 0.6) !important;
 }
 .rider-special {
   background: rgb(243, 109, 63) !important;
 }
 .rider-special-nohud {
-  background: rgba(243, 109, 63, 0.4) !important;
+  background: rgba(243, 109, 63, 0.6) !important;
 }
 .wkg-orange {
   color: orange;
