@@ -16,8 +16,8 @@
         "overlay": true,
         "frame": false,
         "default_bounds": {
-            "width": 600,
-            "height": 250,
+            "width": 250,
+            "height": 500,
             "x": -300,
             "y": 100
         }

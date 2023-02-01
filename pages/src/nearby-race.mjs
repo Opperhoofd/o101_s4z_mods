@@ -20,6 +20,7 @@ common.settingsStore.setDefault({
     solidBackground: false,
     backgroundColor: '#00ff00',
     ridersToUpdate: 20,
+    noHUD: false,
 });
 
 if (window.isElectron) {
@@ -58,7 +59,6 @@ function makeLazyGetter(cb) {
 
 export async function main() {
     common.initInteractionListeners();
-    common.settingsStore.set('noHUD', false);
     let refresh;
     const setRefresh = () => {
         refresh = (common.settingsStore.get('refreshInterval') || 0) * 1000 - 100; // within 100ms is fine.
