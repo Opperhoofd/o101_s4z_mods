@@ -68,9 +68,9 @@ function getPowerWkg(info) {
 }
 
 function setValue(id, value, unit) {
-    const div = mainDiv.querySelector(id);
+    const div = mainDiv.querySelector(id).querySelector('div');
         
     if (div == null || value == null) return '&nbsp';
     
-    div.innerHTML = value+'<div class="unit">'+unit+'<div>';
+    div.innerHTML = value;
 }
