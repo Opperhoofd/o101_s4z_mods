@@ -1,0 +1,152 @@
+#content {
+    padding-top: 5px;
+}
+
+div .ladderheader {
+    font-size: larger;
+    line-height: 1.2;
+    color: black;
+    font-weight: 700;
+}
+
+#myTeam {
+    background-image: linear-gradient(#fff, #fff);
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    border-bottom: darkgray 1px solid;
+    padding-left: 0.2em;
+    font-variant-numeric: tabular-nums !important;
+}
+
+#opponentTeam {
+    background-image: linear-gradient(#fff, #fff);
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+    padding-left: 0.2em;
+    font-variant-numeric: tabular-nums !important;
+}
+
+#myTeam span:nth-of-type(2), #opponentTeam span:nth-of-type(2) {
+    float: right;
+    padding-right: 0.2em;
+}
+
+#eventInfo, #eventPowerUps {
+    background-image: linear-gradient(135deg, hsl(var(--theme-bg-hue) var(--theme-bg-sat) var(--theme-bg-light)/var(--final-bg-opacity)), hsl(var(--theme-bg2-hue) var(--theme-bg2-sat) var(--theme-bg2-light)/var(--final-bg-opacity)));
+    color: white;
+    padding-left: 0.2em;
+    font-weight: 600;
+    font-size: smaller;
+}
+
+#eventPowerUps {
+    padding-bottom: 0.2em;
+}
+
+#eventPowerUps img {
+    max-width: calc(var(--font-scale) * 8vw);
+    display: inline-block;
+    vertical-align: bottom;
+    padding-top: 0.1em;
+    padding-left: 0.2em;
+}
+
+#debug {
+    color: white;
+    font-size: smaller;
+    font-weight: 100;
+}
+
+div .winner {
+    background-image: linear-gradient(#66ff00, #66ff00) !important;
+}
+div .loser {
+    background-image: linear-gradient(#fe4c2c, #fe4c2c) !important;
+}
+
+div .info-item-ladder-gap {
+    font-size: smaller;
+    max-width: 3em;
+    text-align: right;
+    overflow: hidden;
+    padding-right: 0.4em;
+}
+div .info-item-ladder-title {
+    font-size: smaller;
+    flex-grow: 1;  
+    overflow: hidden;
+    padding-left: 0.2em;
+}
+div .info-item-ladder-speed {
+    font-size: smaller;
+    min-width: 2em;
+    text-align: right;
+}
+div .info-item-ladder-speed img {
+    max-width: calc(var(--font-scale) * 6vw);
+    filter: invert(5%);
+    display: inline-block;
+    vertical-align: bottom;
+    padding-left: 0.1em;
+    padding-right: 0.2em;
+    padding-bottom: 0.25em;
+}
+div .info-item-speed-delta {
+    min-width: 1.5em;
+    text-align: right;
+    padding-right: 0.2em;
+    margin-top: -0.2em;
+}
+div .info-item-zrs {
+    min-width: 5.4ch;
+    padding-top: 0.2em;
+    padding-left: 0.2em;
+    padding-right: 0.4em;
+    text-align: left;
+    opacity: 0.6;
+    font-weight: 300;
+}
+div .info-item-wkgstats {
+    min-width: 15ch;
+    padding-top: 0.2em;
+    padding-right: 0.4em;
+    text-align: right;
+    opacity: 0.6;
+    font-weight: 300;
+}
+
+div .info-item-height {
+    min-width: 4ch;
+    padding-top: 0.2em;
+    text-align: right;
+    opacity: 0.6;
+    font-weight: 300;
+}
+
+div .info-item-weight {
+    min-width: 4.5ch;
+    padding-top: 0.2em;
+    text-align: right;
+    opacity: 0.6;
+    font-weight: 300;
+}
+
+.slower {
+    zoom: 0.6 !important;
+    opacity: 1 !important;
+    color: greenyellow;
+}
+
+.faster {
+    zoom: 0.6 !important;
+    opacity: 1 !important;
+    color: red;
+}
+
+div .ladder {
+    background-color: lightgray !important;
+    color: black;
+    font-weight: 700;
+    font-size: larger;
+    line-height: 1.2;
+}

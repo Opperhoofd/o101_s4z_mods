@@ -1,0 +1,8 @@
+#content {
+    background-image: linear-gradient(135deg, hsl(var(--theme-bg-hue) var(--theme-bg-sat) var(--theme-bg-light)/var(--final-bg-opacity)), hsl(var(--theme-bg2-hue) var(--theme-bg2-sat) var(--theme-bg2-light)/var(--final-bg-opacity)));
+    border-radius: 6px;
+}
+
+div .info-item-flag img {
+    max-width: 8vw !important;
+}
