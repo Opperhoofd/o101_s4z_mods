@@ -743,6 +743,7 @@ function createLadderGroup(id, speed, header = '') {
 }
 
 function handleFinishedRiders(finishedRiders) {
+    finishedRiders = finishedRiders.filter(fr => !fr.pending)  ;
     if (finishedRiders.length == 0) return;
 
     state.finishedRiders = [];
