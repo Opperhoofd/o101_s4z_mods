@@ -6,7 +6,7 @@ import * as o101Ext from './o101/extensions.mjs';
 const doc = document.documentElement;
 
 common.settingsStore.setDefault({
-    myZwiftID: 0,
+    myZwiftId: 0,
 });
 
 const state = {
@@ -44,7 +44,7 @@ export async function main() {
 }
 
 async function onSettingsChanged() {
-    state.myId = common.settingsStore.get('myZwiftID');
+    state.myId = common.settingsStore.get('myZwiftId');
     state.showMarkedRiders = common.settingsStore.get('showMarkedRiders');
     state.showRoboPacers = common.settingsStore.get('showRoboPacers');
     await initialize();
@@ -106,8 +106,16 @@ async function loadRoboPacers() {
     let roboPacers = [];
 
     switch (worldId) {
-        case 1: {
+        case 1: { // Watopia
             roboPacers = [5147250,5147260,5147267,5147276,5147285,5162620,5147292,5147294,5147298];
+            break;
+        }
+        case 4: { // New York
+            roboPacers = [5147310,5147311,5147315,5162617];
+            break;
+        }
+        case 9: { // Makuri Islands
+            roboPacers = [5147303,5147317,5147320,5147324,5147325];
             break;
         }
     }

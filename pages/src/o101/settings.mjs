@@ -10,3 +10,15 @@ export async function main(fieldsKey) {
     });
     await common.initSettingsForm('form#options')();
 }
+
+export async function getWatchingId() {
+    const nearbyData = await common.rpc.getNearbyData();
+    if (nearbyData == null) {
+        console.log('No nearby data');
+        return;
+    };
+    const rider = nearbyData.filter(a => a.watching)[0];
+    console.log(rider.athleteId);
+
+    return rider != null ? rider.athleteId : '';
+}

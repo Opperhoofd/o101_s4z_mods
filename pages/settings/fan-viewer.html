@@ -13,8 +13,16 @@
         <title>O101: Fan Viewer - Settings</title>
 
         <script type="module">
-            import {main} from '../src/o101/settings.mjs';
+            import {main,getWatchingId} from '../src/o101/settings.mjs';
             main('fan-viewer-fields-v2');
+            document.querySelector('#myZwiftId').setAttribute('wid', await getWatchingId());
+        </script>
+        <script>
+            function setCurrentId() {
+                const input = document.querySelector('#myZwiftId');
+                input.value = input.getAttribute('wid');
+                input.dispatchEvent(new Event("input", { bubbles: true }));
+            }
         </script>
     </head>
     <body>
@@ -38,7 +46,7 @@
                 <hr/>
                 <label>
                     <key>My Zwift ID:</key>
-                    <input type="text" name="myZwiftID" size="12"/>
+                    <input id="myZwiftId" type="text" name="myZwiftId" size="12"/><input type="button" value="Set current" onclick="setCurrentId()"/>
                 </label>
                 <label>
                     <key>Show marked riders:</key>

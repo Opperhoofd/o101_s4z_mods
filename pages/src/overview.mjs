@@ -58,7 +58,7 @@ const overviewData = {
 common.settingsStore.setDefault({
     fontScale: 1,
     solidBackground: false,
-    backgroundColor: '#00ff00',
+    backgroundColor: '#000',
     showRiderInfo: true,
     showEventInfo: true,
     hideEventLapInfo: true,

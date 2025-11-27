@@ -19,7 +19,7 @@ let zoom;
 common.settingsStore.setDefault({
     zoom: 1,
     solidBackground: false,
-    backgroundColor: '#00ff00',
+    backgroundColor: '#000',
     showVirtualGear: false,
     showSpeed: true,
     showPower: true,
