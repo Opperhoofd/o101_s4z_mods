@@ -23,9 +23,12 @@ const getTeam = (athlete) => {
 }
 
 const createRider = (athlete) => {
+    const id = athlete.id;
+    const overrider = o101Common.getOverRider(id);
+    
     return {
-        id: athlete.id,
-        name: o101Common.fmtName(athlete),
+        id: id,
+        name: (overrider!= null) ? overrider.alias : o101Common.fmtName(athlete),
         team: getTeam(athlete),
         flag: o101Common.fmtFlag(athlete)        
     };
