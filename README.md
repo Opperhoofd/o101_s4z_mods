@@ -1,9 +1,4 @@
-Onno's racing MODS, for Sauce for Zwift™
-===========
-
-[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/oaphinan)
-
-# Table of Contents
+# [O101 racing MODS](#O101-racing-MODS), for Sauce for Zwift™
 - [Nearby Race v2](#nearby-race-v2)
 - [Groups Race](#groups-race)
 - [Ladder Race](#ladder-race)
@@ -12,7 +7,9 @@ Onno's racing MODS, for Sauce for Zwift™
 - [Progress Bar](#progress-bar)
 - [Fan Viewer](#fan-viewer)
 
-## Nearby Race-v2
+[!["Buy-Me-A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/oaphinan)
+
+## Nearby Race v2
 ![O101-nearby-race-v2](assets/images/O101-nearby-race-v2.png)
 
 The nearby race v2 mod window is the default Zwift nearby riders on steroids. You can overlay the default Zwift nearby window or in no-HUD have it on your desired position.
