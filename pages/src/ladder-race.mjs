@@ -777,7 +777,7 @@ function handleFinishedRiders(finishedRiders) {
         let wkg = fr.sensorData.avgWatts / fr.athlete.weight;
         rider.power = sauce.locale.human.number(wkg, {precision: 1, fixed: true});
         rider.hr = fr.sensorData.heartRateData.avgHeartRate;
-        rider.zrs = sauce.locale.human.number(fr.scoreHistory.previousScore, {precision: 0, fixed: true});
+        rider.zrs = sauce.locale.human.number(fr.scoreHistory?.previousScore, {precision: 0, fixed: true});
 
         if (!isMyTeamRider(rider.id) && ! isOpponentTeamRider(rider.id)) continue;
 
