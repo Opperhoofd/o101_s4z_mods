@@ -148,6 +148,17 @@ export async function main() {
     render();
 }
 
+export async function tttAction(action) {
+    if (action=='tttMarkedRidersAddAll' || action == 'tttMarkedRidersRemoveAll') {
+        updateSettings();
+        const marked = action=='tttMarkedRidersAddAll';
+        for(let rider of settings.nearby.tttMode.riders) {
+            console.log(rider.id)
+            await common.rpc.updateAthlete(rider.id, {marked: marked});
+        }
+    }
+}
+
 function render() {
     updateSettings();
     common.setBackground(common.settingsStore.get());
