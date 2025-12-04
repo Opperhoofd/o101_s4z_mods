@@ -72,13 +72,6 @@ div .info-item-flag img {
     vertical-align: middle;
     display: inline-block;
 }
-div .info-item-flag img {
-    width: 100%;
-    height: auto;
-    max-width: calc(var(--font-scale) * 8vw);
-    vertical-align: middle;
-    display: inline-block;
-}
 div .info-item-value {
     font-variant-numeric: tabular-nums !important;
     padding-right: 0.2em;

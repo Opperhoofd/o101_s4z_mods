@@ -13,7 +13,7 @@ let lastRefreshDate = Date.now() - 99999;
 const defaultTeamName = 'DON\'T CLICK ME';
 const maxPoints = 10;
 const state = {
-    initialized: 0,
+    initialized: false,
     watchingId: 0,
     eventSubgroupId: 0,
     eventStart: Date.now() - 1,
@@ -29,10 +29,18 @@ const state = {
 
 const powerUpsState = o101Common.initPowerUpsState();
 
+const initialized = () => {
+    if (state.initialized) return state.initialized;
+
+    initializeLadderData();
+    
+    return state.initialized;
+}
+
 common.settingsStore.setDefault({
     refreshInterval: 2,
     fontScale: 1,
-    myTeamHeader: 'kutzooi',
+    myTeamHeader: '',
     myTeamBadge: '',
     myTeamRiders: '0',
     opponentTeamHeader: '',
@@ -40,20 +48,19 @@ common.settingsStore.setDefault({
     opponentTeamRiders: '0',
     maxGroups: 8,
     showRegisteredRidersOnly: false,
-    showWbal: true,
+    showWbal: false,
     showRacingScore: false,
     scoringCalculation: 'position',
     showFooter: true,
     manualMode: false,
-    riderOverviewMinutes: 5,
+    riderOverviewMinutes: 2,
     autoSwitchRider: false,
     autoSwitchRiderInterval: 5,
-    teamMaxChars: 15,
-    raceEndsMinutes: 15,
+    teamMaxChars: 16,
+    raceEndsMinutes: 5,
     showNearbyRiders: false,
     showLiveData: true,
-    showStats: false,
-    multiLapRace: false
+    showStats: false
 });
 
 export async function main() {
@@ -101,7 +108,6 @@ function updateSettings() {
         showNearbyRiders: common.settingsStore.get('showNearbyRiders'),
         showLiveData: common.settingsStore.get('showLiveData'),
         showStats: common.settingsStore.get('showStats'),
-        multiLapRace: common.settingsStore.get('multiLapRace'),
         zrApiKey: common.settingsStore.get('ZRAPIKEY'),
         hideFlags: common.settingsStore.get('hideFlags')
     }
@@ -160,26 +166,23 @@ async function initializeLadderData() {
         common.settingsStore.set('opponentTeamRiders', settings.ladder.opponentTeamRiders.join(","));
 
         settings.ladder.showRegisteredRidersOnly = true;
-        settings.ladder.multiLapRace = zwiftEvent.laps > 0;
 
         state.eventPowerUps = o101Common.getEventPowerUps(zwiftEvent);
         state.initialized = true;
 
         initRiderStats(homeSignups.concat(awaySignups));
+        
+        return;
     }
 }
 
 async function initRiderStats(signups) {
     if (settings.ladder.zrApiKey == '' || settings.ladder.zrApiKey == null) return;
 
-    let response = await fetch("https://zwift-ranking.herokuapp.com/public/riders", {
-        method: "POST",
-        headers: {
-            "Authorization": settings.ladder.zrApiKey,
-            "Content-Type": "application/json"
-        },
-        body: '['+signups.join(",")+']'
-    });
+    let response = await getRiderStats('https://api.zwiftracing.app/public/riders', signups);
+    if (response.status == 404) {
+        response = await getRiderStats('https://zwift-ranking.herokuapp.com/public/riders', signups);
+    }
 
     const storageKey = 'riderStatsZR';
 
@@ -200,6 +203,17 @@ async function initRiderStats(signups) {
     state.stats = stats;
 }
 
+async function getRiderStats(url, signups) {
+    return await fetch(url, {
+        method: "POST",
+        headers: {
+            "Authorization": settings.ladder.zrApiKey,
+            "Content-Type": "application/json"
+        },
+        body: '['+signups.join(",")+']'
+    });
+}
+
 function fmtPowerSummary(rider) {
     return sauce.locale.human.number(rider.power.wkg15, {precision: 1, fixed: true}) + '/'
         + sauce.locale.human.number(rider.power.wkg60, {precision: 1, fixed: true}) + '/'
@@ -208,10 +222,10 @@ function fmtPowerSummary(rider) {
 }
 
 async function handleNearbyData(data) {
-    if (!refreshData(data)) return;
-    if (!state.initialized) initializeLadderData();
-    
-    const nearbyData = (settings.ladder.multiLapRace)
+    if (!refreshData(data) || !initialized()) return;
+
+    const multiLapRace = false;//data.some(function(a){ return a.state.laps > 0;});
+    const nearbyData = (multiLapRace)
         ? data.sort(function(a, b) { return a.eventPosition - b.eventPosition; })
         : data.sort(function(a, b) { return a.gap - b.gap; });
     
@@ -632,8 +646,9 @@ async function addTeamStats(div, header, riders) {
 
         if (rider == null) continue;
 
-        div.appendChild(createRacerStatsDataItem(rider));
-        div.appendChild(createRacerStatsDataSubItem(rider));            
+        const riderStats = state.stats.length>0 ? state.stats.find(r => r.id == rider.id) : null;
+        div.appendChild(createRacerStatsDataItem(rider, riderStats));
+        div.appendChild(createRacerStatsDataSubItem(rider, riderStats));            
     }
 }
 
@@ -671,25 +686,37 @@ async function getRiderData(id) {
     return rider;
 }
 
-function createRacerStatsDataItem(rider) {
+function createRacerStatsDataItem(rider, riderStats) {
+    if (riderStats==null) {
+        riderStats = {category: rider.category};
+    }
+    const categoryStyle = riderStats.category == 'A+' ? 'APlus' : riderStats.category;
+
     return o101UiLib
         .createDiv(['info-item', 'advanced'])
-        .withChildDiv(['info-item-category', 'cat', 'cat-'+rider.category], '<span>' + rider.category + '</span>', null, 'Zwift Power category')
+        .withChildDiv(['info-item-category', 'cat', 'cat-'+categoryStyle], '<span>' + riderStats.category + '</span>', null, 'Zwift Power category')
         .withChildDivWithDataAttribute(['info-item-name-detailed'], rider.name, 'id', rider.id)
         .withChildDiv(['info-item-team'], rider.team)
         .withOptionalChildDiv(!settings.ladder.hideFlags, ['info-item-flag'], rider.flag);
 }
 
-function createRacerStatsDataSubItem(rider) {   
-    const riderStats = state.stats.length>0 ? state.stats.find(r => r.id == rider.id).powerSummary : '';
+function createRacerStatsDataSubItem(rider, riderStats) {
+    if (riderStats != null) {
+    return o101UiLib
+        .createDiv(['info-item', 'sub', 'divider'])
+        .withOptionalCssClass(rider.watching, ['watching'])
+        //.withOptionalCssClass(rider.powerUp.image!='', ['powerUpRemaining'], rider.powerUp)
+        .withChildDiv(['info-item-ftp'], riderStats.ftp + 'W', null, 'Zwift Power FTP')
+        .withOptionalChildDiv(riderStats != null, ['info-item-wkgstats'], riderStats.powerSummary + ' Wkg')
+        //.withOptionalChildDiv(rider.height != null, ['info-item-height'], rider.height + ' cm')
+        .withOptionalChildDiv(riderStats.weight != null, ['info-item-weight'], riderStats.weight + ' kg');
+    }
 
     return o101UiLib
         .createDiv(['info-item', 'sub', 'divider'])
         .withOptionalCssClass(rider.watching, ['watching'])
-        .withOptionalCssClass(rider.powerUp.image!='', ['powerUpRemaining'], rider.powerUp)
-        //.withChildDiv(['info-item-zrs'], zrs>0 ? zrs : '&nbsp;', null, 'Zwift Racing Score')
-        .withOptionalChildDiv(riderStats != '', ['info-item-wkgstats'], riderStats + ' Wkg')
-        // .withOptionalChildDiv(rider.height != null, ['info-item-height'], rider.height + ' cm')
+        //.withOptionalCssClass(rider.powerUp.image!='', ['powerUpRemaining'], rider.powerUp)
+        .withOptionalChildDiv(rider.height != null, ['info-item-height'], rider.height + ' cm')
         .withOptionalChildDiv(rider.weight != null, ['info-item-weight'], rider.weight + ' kg');
 }
 
