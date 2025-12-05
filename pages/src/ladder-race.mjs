@@ -109,7 +109,8 @@ function updateSettings() {
         showLiveData: common.settingsStore.get('showLiveData'),
         showStats: common.settingsStore.get('showStats'),
         zrApiKey: common.settingsStore.get('ZRAPIKEY'),
-        hideFlags: common.settingsStore.get('hideFlags')
+        hideFlags: common.settingsStore.get('hideFlags'),
+        autoResultsDisabled: common.settingsStore.get('autoResultsDisabled')
     }
 
     state.data = [];
@@ -408,10 +409,8 @@ async function handleLadderData(ladderData) {
             }
         }
 
-        if (state.finishedRiders.length>0) {
-            o101UiLib.toggleClassByElements(true, scoring.myResult, ['#myTeam']);
-            o101UiLib.toggleClassByElements(true, scoring.opponentResult, ['#opponentTeam']);
-        }
+        o101UiLib.toggleClassByElements(state.finishedRiders.length>0, scoring.myResult, ['#myTeam']);
+        o101UiLib.toggleClassByElements(state.finishedRiders.length>0, scoring.opponentResult, ['#opponentTeam']);
     }
 
     o101UiLib.setValue('#myTeam', '<span>' + getTeamHeader(settings.ladder.myTeamHeader) + '</span><span>' + scoring.myPoints + '</span>');
@@ -770,7 +769,15 @@ function createLadderGroup(id, speed, header = '') {
 }
 
 function handleFinishedRiders(finishedRiders) {
-    finishedRiders = finishedRiders.filter(fr => !fr.pending)  ;
+    if (settings.ladder.autoResultsDisabled) {
+        state.finishedRiders = [];
+        return;
+    }
+        
+    finishedRiders = finishedRiders.filter(fr => !fr.pending);
+    //filter out dns riders?
+    //evaluate race start?
+
     if (finishedRiders.length == 0) return;
 
     state.finishedRiders = [];
@@ -894,9 +901,7 @@ function getScoring(ladderData) {
 
     if (scoring.myPoints > scoring.opponentPoints) {
         scoring.myResult = 'winner';
-        scoring.opponentResult = 'loser';
     } else {
-        scoring.myResult = 'loser';
         scoring.opponentResult = 'winner';
     }
 

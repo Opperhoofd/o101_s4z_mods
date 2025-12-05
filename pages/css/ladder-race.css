@@ -60,9 +60,6 @@ div .ladderheader {
 div .winner {
     background-image: linear-gradient(#66ff00, #66ff00) !important;
 }
-div .loser {
-    background-image: linear-gradient(#fe4c2c, #fe4c2c) !important;
-}
 
 div .info-item-ladder-gap {
     font-size: smaller;
