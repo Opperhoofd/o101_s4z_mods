@@ -129,15 +129,17 @@ div .info-item-weight {
 }
 
 .slower {
-    zoom: 0.6 !important;
+    zoom: 0.7 !important;
     opacity: 1 !important;
-    color: greenyellow;
+    color: rgb(76, 255, 76);
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
 }
 
 .faster {
-    zoom: 0.6 !important;
+    zoom: 0.7 !important;
     opacity: 1 !important;
     color: red;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
 }
 
 div .ladder {

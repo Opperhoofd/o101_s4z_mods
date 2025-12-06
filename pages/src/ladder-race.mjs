@@ -114,12 +114,11 @@ function updateSettings() {
     }
 
     state.data = [];
+    state.watchingId = settings.ladder.watchingIdOverride ?? 0;
 }
 
 async function initializeLadderData() {
-    state.watchingId = settings.ladder.watchingIdOverride;
-
-    if (state.watchingId == null || state.watchingId == 0) {
+    if (state.watchingId == 0) {
         const nearbyData = await common.rpc.getNearbyData();
         const watchedRider = nearbyData.find(r => r.watching);
         state.watchingId = watchedRider ? watchedRider.athleteId : 0;
@@ -132,7 +131,8 @@ async function initializeLadderData() {
 
         const ladderResponse = await fetch('https://ladder.cycleracing.club/whatFixtureShouldIBeIn/' + state.watchingId).then(response=>response.json());
         if (ladderResponse == null || ladderResponse.length<1) {
-            console.log('WARNING: no ladder event found for rider' + state.watchingId);
+            console.log('WARNING: no ladder event found for rider ' + state.watchingId);
+            state.watchingId = -1; // stop checking for ladder event
             return;
         } 
         const eventData = ladderResponse[0];
@@ -262,7 +262,7 @@ async function handleNearbyData(data) {
 
 async function createLadderData(data) {
     handleAutoSwitchRider(data);
-    handleFinishedRiders(await common.rpc.getEventSubgroupResults(state.eventSubgroupId));
+    if (state.eventSubgroupId>0) handleFinishedRiders(await common.rpc.getEventSubgroupResults(state.eventSubgroupId));
 
     const ladderData = {
         riders: [],
