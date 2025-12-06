@@ -225,7 +225,7 @@ function fmtPowerSummary(rider) {
 async function handleNearbyData(data) {
     if (!refreshData(data) || !initialized()) return;
 
-    const multiLapRace = false;//data.some(function(a){ return a.state.laps > 0;});
+    const multiLapRace = data.some(function(a){ return a.lapCount > 0;});
     const nearbyData = (multiLapRace)
         ? data.sort(function(a, b) { return a.eventPosition - b.eventPosition; })
         : data.sort(function(a, b) { return a.gap - b.gap; });
@@ -774,7 +774,8 @@ function handleFinishedRiders(finishedRiders) {
         return;
     }
         
-    finishedRiders = finishedRiders.filter(fr => !fr.pending);
+    //finishedRiders = finishedRiders.filter(fr => !fr.pending);
+    //dnf
     //filter out dns riders?
     //evaluate race start?
 

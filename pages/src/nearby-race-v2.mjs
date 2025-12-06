@@ -153,7 +153,6 @@ export async function tttAction(action) {
         updateSettings();
         const marked = action=='tttMarkedRidersAddAll';
         for(let rider of settings.nearby.tttMode.riders) {
-            console.log(rider.id)
             await common.rpc.updateAthlete(rider.id, {marked: marked});
         }
     }

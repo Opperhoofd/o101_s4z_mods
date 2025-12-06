@@ -75,7 +75,6 @@ function handleData(info) {
         courseInfo.distanceCompleted =  info.state.eventDistance;
         courseInfo.progress = info.state.eventDistance / routeDistance * 100;
         courseInfo.distanceCompleted = info.state.distance;
-        console.log(route)
     } else {
         let zwiftRoute = o101Common.lazyGetRoute(event.activeEvent.routeId);
 

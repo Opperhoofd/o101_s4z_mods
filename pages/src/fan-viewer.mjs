@@ -5,17 +5,6 @@ import * as o101Ext from './o101/extensions.mjs';
 
 const doc = document.documentElement;
 
-common.settingsStore.setDefault({
-    myZwiftId: 0,
-});
-
-const state = {
-    myId: 0,
-    watchingId: 0,
-    showMarkedRiders: false,
-    showRoboPacers: false,
-};
-
 const getTeam = (athlete) => {
     const overrider = o101Common.getOverRider(athlete.id);
     let teamBadgeOverride = (overrider!= null) ? overrider.team : null;
@@ -34,22 +23,14 @@ const createRider = (athlete) => {
     };
 }
 
-export async function main() {
+export async function fanviewer() {
     common.initInteractionListeners();
-    common.subscribe('watching-athlete-change', athleteChange);
-    //common.subscribe('athlete/watching', updateCams);
-    common.settingsStore.addEventListener('changed', onSettingsChanged);
+    common.subscribe('athlete/watching', updateMetrics);
+    common.settingsStore.addEventListener('changed', initialize);
     
     o101Common.initNationFlags();
     await o101Common.initTeamColors();    
     await o101Common.initOverRiders();    
-    await onSettingsChanged();
-}
-
-async function onSettingsChanged() {
-    state.myId = common.settingsStore.get('myZwiftId');
-    state.showMarkedRiders = common.settingsStore.get('showMarkedRiders');
-    state.showRoboPacers = common.settingsStore.get('showRoboPacers');
     await initialize();
 }
 
@@ -70,28 +51,33 @@ export async function changeCamera() {
     await common.rpc.changeCamera();   
 }
 
+function updateMetrics(info) {
+    setValue('#speed', o101Common.formatNumber(info.state.speed, 0) + '<abbr class="speed">kph</abbr>');
+    setValue('#power', info.state.power + '<abbr class="power">W</abbr>', null, o101Common.fmtWkg(info));
+    setValue('#powerwkg', o101Common.fmtWkg(info) + '<abbr class="power">Wkg</abbr>', null, o101Common.fmtWkg(info));
+}
+
+function setValue(id, value, img, wkg = 0) {
+    const div = doc.querySelector(id);
+        
+    if (div == null || value == null) return '&nbsp';
+    
+    if (img != null){
+        div.innerHTML = value + img;
+    } else {
+        div.innerHTML = value;
+        div.withWkgColor(wkg);
+    }
+}
+
 async function initialize() {
-    await loadMe();
     await loadMarkedRiders();
     await loadRoboPacers();
 }
 
-async function loadMe() {
-    const div = doc.querySelector('#me');
-    div.innerHTML = '';
-
-    const athlete = await common.rpc.getAthlete(state.myId);
-    if (athlete == null) return;
-
-    const me = createRider({id:athlete.id, athlete});    
-
-    div.appendChild(createAthleteDiv(me));
-}
-
 async function loadMarkedRiders() {
-    const div = doc.querySelector('#markedRiders');
+    const div = doc.querySelector('#marked-riders div.content');
     div.innerHTML = '';
-    if (!state.showMarkedRiders) return;
 
     const markedAthletes = await common.rpc.getMarkedAthletes();
     const markedRiders = markedAthletes.map(a => { return createRider(a); });
@@ -101,14 +87,13 @@ async function loadMarkedRiders() {
 }
 
 async function loadRoboPacers() {
-    const div = doc.querySelector('#roboPacers');
+    const div = doc.querySelector('#robo-pacers div.content');
     div.innerHTML = '';
-    if (!state.showRoboPacers) return;
-
+    
     const worldId = await getWorldIdOfWatchedRider();
     let roboPacers = [];
 
-    switch (worldId) {
+    switch (parseInt(worldId)) {
         case 1: { // Watopia
             roboPacers = [5147250,5147260,5147267,5147276,5147285,5162620,5147292,5147294,5147298];
             break;
@@ -121,6 +106,14 @@ async function loadRoboPacers() {
             roboPacers = [5147303,5147317,5147320,5147324,5147325];
             break;
         }
+        case 10: { // France
+            roboPacers = [5147303,5147311,5147317,5162617,5147320,5147324,5147325];
+            break;
+        }
+        case 11: { // Paris
+            roboPacers = [5147310,5147315];
+            break;
+        }        
     }
 
     for (let rp of roboPacers) {
@@ -199,12 +192,7 @@ async function getMyGroup() {
 }
 
 async function watchRider(id) {
-    state.watchingId = id;
     await common.rpc.watch(id); 
-}
-
-async function athleteChange(id) {
-    state.watchingId = id;
 }
 
 async function getWorldIdOfWatchedRider() {
@@ -219,10 +207,10 @@ async function getWorldIdOfWatchedRider() {
 
 function createAthleteDiv(athlete) {
     let divAthlete = o101UiLib
-        .createDiv(['info-item', 'advanced'])
-        .withChildDiv(['info-item-name-detailed'], athlete.name)
-        .withChildDiv(['info-item-team'], athlete.team)
-        .withChildDiv(['info-item-flag'], athlete.flag);
+        .createDiv(['action-item'])
+        .withChildDiv(['action-item-name'], athlete.name)
+        .withChildDiv(['action-item-team'], athlete.team)
+        .withChildDiv(['action-item-flag'], athlete.flag);
     divAthlete.onclick = function() { watch('watchAthleteById', athlete.id); };
 
     return divAthlete;

@@ -3,6 +3,114 @@
     border-radius: 6px;
 }
 
-div .info-item-flag img {
-    max-width: 8vw !important;
+#dashboard {
+    visibility: hidden;
+    display: flex;
+    z-index: 10;
+    position: relative;
+    width: auto;
+    height: auto;
+    margin: auto;
+}
+#action-section {
+     z-index: 11;
+     position: relative;
+     height: 100%;
+}
+
+#button-section {
+    z-index: 12;
+    position: relative;
+    width: auto;
+    height: auto;
+    margin: auto;
+}
+
+div .datafields {
+    padding: 0.5em 0.3em;
+    display: flex !important;
+}
+
+div .datafield {
+    background: rgba(0, 0, 0, 0.4) !important;
+    font-variant-numeric: tabular-nums !important;
+    font-size: 2em;
+    font-weight: 700;
+    padding: 0 0.25em 0 0.5em;
+    border-radius: 3px;
+}
+
+#buttons {
+    position: relative;
+    bottom: 0;
+}
+
+#actions div.section {
+    display: none;
+    width: 200px;
+    font-weight: 600;
+    padding: 0.5em 0 0 0.5em;
+}
+
+div.title {
+    background: rgba(255, 255, 255, 0.4) !important;
+    color: #000;
+    border-radius: 3px;
+    text-align: center;
+}
+
+div .button {
+    background: rgba(0, 0, 0, 0.4) !important;
+    padding: 5px;
+    display: inline-block;
+    border-radius: 3px;
+}
+
+div .button img {
+    width: 40px;
+    filter: brightness(0) invert(1);
+}
+
+div.action-item {
+    background: rgba(0, 0, 0, 0.4) !important;
+    display: flex !important;
+    overflow: hidden; 
+    white-space: nowrap;
+}
+
+div.action-item-spacer {
+    line-height: 0.25em;
+}
+
+div.action-item-name {
+    width: 120px;
+    overflow: hidden;
+    padding-left: 0.2em;    
+}
+div .action-item-team {
+    margin-top: -0.1em;
+    width: 3em;
+    overflow: hidden;
+}
+div .action-item-team span {
+    background-image: linear-gradient(var(--o101lg1), var(--o101lg2));
+    border-radius: 4px;
+    font-weight: var(--weight);
+    padding: -1em 0 0 0;
+    color: var(--o101c) !important;
+    zoom: 0.6;
+    
+}
+div .action-item-flag {
+    width: 1.5em;
+}
+div .action-item-flag img {
+    margin-top: 0.3em;
+    max-width: 3vw !important;
+    zoom: 60%;
+}
+
+div .datafield abbr {
+    font-size: 40%;
+    padding-left: 2px;
 }

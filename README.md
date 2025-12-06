@@ -50,7 +50,7 @@ To have a quick start, I'll explain some options, skipping those that are or sho
 **Tips & Tricks**
 - You can have multiple Nearby Race v2 windows. For example, the default and next to that a window of your teammates and/or rivals. Also great for mixed cat or FRR races, see all nearby and your own category.
 - You can zoom in or out using ctrl and + or - keys.
-- For TTT's use marked riders only and name overrides with number prefix.
+- For TTT's use marked riders only and name overrides with number prefix. The name override function has a add to / remove from marked riders button.
 
 ## Groups Race
 ![O101-groups-race](assets/images/O101-groups-race.png)
@@ -122,3 +122,11 @@ The leaderboard is automatic shown/hidden. It is visisble before until after the
 
 ## Fan Viewer
 ![O101-fan-viewer](assets/images/O101-fan-viewer.png)
+
+Fan viewer is a bit like the companion app. But then just the map and elevation. On top of that you have some actions to navigate riders.
+- First/center/last of group
+- First/last of race
+
+Also show your marked riders or robopacers of the world.
+
+There a camera view option which toggles cameras.

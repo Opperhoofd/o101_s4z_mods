@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html tabindex="0" data-settings-key="fan-viewer-settings-v3">
+<html tabindex="0" data-settings-key="geo-settings-v1">
     <head>
         <meta charset="utf-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
@@ -8,56 +8,134 @@
 
         <title>O101: Fan Viewer</title>
 
+        <script src="/pages/src/preloads.js"></script>
+
+        <link rel="manifest" href="/pages/geo-manifest.json"/>
+        <link id="favicon" rel="shortcut icon" href="/pages/images/favicon.png"/>
+        <link rel="stylesheet" href="/pages/css/common.css"/>
+        <link rel="stylesheet" href="/pages/css/geo.css"/>
+        <link rel="stylesheet" href="./css/fan-viewer.css"/>
+
         <script type="module">
-            import {main} from './src/fan-viewer.mjs';
-            import {watch, changeCamera} from './src/fan-viewer.mjs';
-            
+            import {main} from '/pages/src/geo.mjs';
             main();
+        </script>
+
+        <script type="module">
+            import {fanviewer} from './src/fan-viewer.mjs';
+            import {watch, changeCamera} from './src/fan-viewer.mjs';
+            fanviewer();
             window.watch = watch;
             window.changeCamera = changeCamera;
         </script>
 
-        <link id="favicon" rel="shortcut icon" href="../../../../images/favicon.png"/>
-        <link rel="stylesheet" href="/pages/css/common.css"/>
-        <link rel="stylesheet" href="./css/ui.css"/>
-        <link rel="stylesheet" href="./css/nearby-race-v2.css"/>
-        <link rel="stylesheet" href="./css/fan-viewer.css"/>
+        <script>
+            let visibility = [];
+            function toggleVisibility(id) {
+                let div = visibility.find(d => d.id == id);
+                if (div == null) {
+                    div = {
+                        id: id,
+                        visible: false
+                    };
+                    visibility.push(div);
+                }
+
+                if (id=='dashboard') {
+                    document.getElementById(id).style.visibility = div.visible ? 'hidden' : 'visible';
+                } else {
+                    document.getElementById(id).style.display = div.visible ? 'none' : 'block';
+                }
+                div.visible = !div.visible;
+            }
+        </script>
     </head>
     <body>
         <div id="titlebar">
             <header>
                 <div class="logo"><img src="/pages/images/icon128.png"/></div>
-                <div class="title">O101: Fan Viewer</div>
+                <div class="title">Map</div>
+                <div class="course"><select required name="course"></select></div>
+                <div class="route"><select required name="route"></select></div>
                 <div class="filler"></div>
                 <div class="buttons">
                     <a class="button" onClick="window.location.reload()" title="Reload">&#x21bb;</a>
                     <a class="button open-settings" href="./settings/fan-viewer.html?width=375&height=350&child-window"
-                       title="Open settings window" target="fan-viewer-settings"><ms>settings</ms></a>
+                       title="Open fan viewer settings window" target="fan-viewer-settings"><ms>settings</ms></a>
+                    <a class="button open-settings" href="/pages/geo-settings.html?width=450&height=630&child-window"
+                       title="Open map settings window" target="geo-settings"><ms>settings</ms></a>
                     <div title="Minimize" class="button minimize electron-only"><ms>minimize</ms></div>
                     <div title="Close this window" class="button close electron-only"><ms>close</ms></div>
                 </div>
             </header>
         </div>
         <div id="content">
-            <div id="controls">
-                <div class="header"><span>Fan viewer</span></div>
-                <div id="me"></div>
-                <div>
-                    <div class="info-item header"><span>Group options</span></div>
-                    <div onClick="watch('watchFirstOfGroup')">&#x23EA; First of group</div>
-                    <div onClick="watch('watchCenterOfGroup')">&#x1F7E1; Center of group</div>
-                    <div onClick="watch('watchLastOfGroup')">&#x23E9; Last of group</div>
+            <div class="fields"></div>
+            <div class="elevation-profile" style="z-index: 2;"></div>
+            <div class="map" style="z-index: 1; position: absolute; top: 0; left: 0;"></div>
+            <div id="map-controls" class="map-controls" style="left: unset; right: 0;">
+                <div class="button std icon icon-only toggle-auto-heading"
+                     title="Toggle heading rotation"><ms>explore</ms></div>
+                <div class="button std icon icon-only toggle-auto-center"
+                     title="Toggle automatic centering"><ms>my_location</ms></div>
+            </div>
+
+            <div id="dashboard">
+                <div class="datafields">
+                    <div id="speed" class="datafield">42</div>
                 </div>
-                <div class="info-item header"><span>Miscellaneous</span></div>
-                <div>
-                    <div onClick="watch('watchFirstOfRace')">&#x23EA; First of race</div>
-                    <div onClick="watch('watchLastOfRace')">&#x23E9; Last of race</div>
-                    <div onClick="changeCamera()">&nbsp;&#x21bb;&nbsp; Change camera</div>
+                <div class="datafields">
+                    <div id="power" class="datafield">246</div>
                 </div>
-                <div class="info-item header"><span>Marked athletes</span></div>
-                <div id="markedRiders"></div>
-                <div class="info-item header"><span>Robo pacers</span></div>
-                <div id="roboPacers"></div>
+                <div class="datafields">
+                    <div id="powerwkg" class="datafield">3.2</div>
+                </div>
+            </div>
+            <div id="action-section">
+                <div id="actions">
+                    <div id="group-controls" class="section">
+                        <div class="title">View Options</div>
+                        <div class="content" class="section">
+                            <div class="action-item" onClick="watch('watchFirstOfGroup')">&#x23EA; First of group</div>
+                            <div class="action-item" onClick="watch('watchCenterOfGroup')">&#x1F7E1; Center of group</div>
+                            <div class="action-item" onClick="watch('watchLastOfGroup')">&#x23E9; Last of group</div>
+                            <div class="action-item-spacer">&nbsp;</div>
+                            <div class="action-item" onClick="watch('watchFirstOfRace')">&#x23EA; First of race</div>
+                            <div class="action-item" onClick="watch('watchLastOfRace')">&#x23E9; Last of race</div>
+                        </div>
+                    </div>
+                    <div id="marked-riders" class="section">
+                        <div class="title">Marked Riders</div>
+                        <div class="content" class="section"></div>
+                    </div>
+                    <div id="robo-pacers" class="section">
+                        <div class="title">Robo Pacers</div>
+                        <div class="content" class="section"></div>
+                    </div>
+                    <div id="camera" class="section">camera</div>
+                </div>
+            </div>
+            <div id="button-section">
+                <div id="buttons">
+                    <div class="button" onClick="toggleVisibility('dashboard')">
+                        <img src="./images/dashboard.png">
+                    </div>
+                    <div class="button">
+                        <img src="./images/group.png" onClick="toggleVisibility('group-controls')">
+                    </div>
+                    <div class="button" onClick="toggleVisibility('marked-riders')">
+                        <img src="./images/marked.png">
+                    </div>
+                    <div class="button" onClick="toggleVisibility('robo-pacers')">
+                        <img src="./images/bicycle-robo.png">
+                    </div>
+                    <div class="button" onClick="changeCamera()">
+                        <img src="./images/video.png">
+                    </div>
+                    <div class="button">
+                        <a href="/pages/geo-settings.html?width=450&height=630&child-window" title="Open fan viewer geo settings window" target="fan-viewer-geo-settings"><img src="./images/settings.png"></a>
+                    </div>
+                </div>
             </div>
         </div>
         <div id="hintbar">
