@@ -48,15 +48,20 @@
                 }
                 div.visible = !div.visible;
             }
-            let titleBarHeight = 'unset';
+            let titleBarvisible = false;
             function toggleTitlebar() {
-                document.getElementById('titlebar').style.maxHeight = titleBarHeight;
-                titleBarHeight = titleBarHeight=='unset'?'0px':'unset';
+                if (titleBarvisible) {
+                    document.querySelector('#titlebar').classList.remove('always-visible');
+                } else {
+                    document.querySelector('#titlebar').classList.add('always-visible');
+                }
+
+                titleBarvisible = !titleBarvisible;
             }
         </script>
     </head>
     <body>
-        <div id="titlebar">
+        <div id="titlebar" style="z-index: 99;">
             <header>
                 <div class="logo"><img src="/pages/images/icon128.png"/></div>
                 <div class="title">O101: Fan Viewer</div>
@@ -97,8 +102,8 @@
             <div id="action-section">
                 <div id="actions">
                     <div id="group-controls" class="section">
-                        <div class="title">View Options</div>
-                        <div class="content" class="section">
+                        <div class="action-title">View Options</div>
+                        <div class="action-content" class="section">
                             <div class="action-item" onClick="watch('watchFirstOfGroup')">&#x23EA; First of group</div>
                             <div class="action-item" onClick="watch('watchCenterOfGroup')">&#x1F7E1; Center of group</div>
                             <div class="action-item" onClick="watch('watchLastOfGroup')">&#x23E9; Last of group</div>
@@ -108,12 +113,12 @@
                         </div>
                     </div>
                     <div id="marked-riders" class="section">
-                        <div class="title">Marked Riders</div>
-                        <div class="content" class="section"></div>
+                        <div class="action-title">Marked Riders</div>
+                        <div class="action-content" class="section"></div>
                     </div>
                     <div id="robo-pacers" class="section">
-                        <div class="title">Robo Pacers</div>
-                        <div class="content" class="section"></div>
+                        <div class="action-title">Robo Pacers</div>
+                        <div class="action-content" class="section"></div>
                     </div>
                     <div id="camera" class="section">camera</div>
                 </div>

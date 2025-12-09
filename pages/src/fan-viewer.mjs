@@ -76,7 +76,7 @@ async function initialize() {
 }
 
 async function loadMarkedRiders() {
-    const div = doc.querySelector('#marked-riders div.content');
+    const div = doc.querySelector('#marked-riders div.action-content');
     div.innerHTML = '';
 
     const markedAthletes = await common.rpc.getMarkedAthletes();
@@ -87,7 +87,7 @@ async function loadMarkedRiders() {
 }
 
 async function loadRoboPacers() {
-    const div = doc.querySelector('#robo-pacers div.content');
+    const div = doc.querySelector('#robo-pacers div.action-content');
     div.innerHTML = '';
     
     const worldId = await getWorldIdOfWatchedRider();
