@@ -48,20 +48,23 @@
                 }
                 div.visible = !div.visible;
             }
+            let titleBarHeight = 'unset';
+            function toggleTitlebar() {
+                document.getElementById('titlebar').style.maxHeight = titleBarHeight;
+                titleBarHeight = titleBarHeight=='unset'?'0px':'unset';
+            }
         </script>
     </head>
     <body>
         <div id="titlebar">
             <header>
                 <div class="logo"><img src="/pages/images/icon128.png"/></div>
-                <div class="title">Map</div>
+                <div class="title">O101: Fan Viewer</div>
                 <div class="course"><select required name="course"></select></div>
                 <div class="route"><select required name="route"></select></div>
                 <div class="filler"></div>
                 <div class="buttons">
                     <a class="button" onClick="window.location.reload()" title="Reload">&#x21bb;</a>
-                    <a class="button open-settings" href="./settings/fan-viewer.html?width=375&height=350&child-window"
-                       title="Open fan viewer settings window" target="fan-viewer-settings"><ms>settings</ms></a>
                     <a class="button open-settings" href="/pages/geo-settings.html?width=450&height=630&child-window"
                        title="Open map settings window" target="geo-settings"><ms>settings</ms></a>
                     <div title="Minimize" class="button minimize electron-only"><ms>minimize</ms></div>
@@ -72,8 +75,8 @@
         <div id="content">
             <div class="fields"></div>
             <div class="elevation-profile" style="z-index: 2;"></div>
-            <div class="map" style="z-index: 1; position: absolute; top: 0; left: 0;"></div>
-            <div id="map-controls" class="map-controls" style="left: unset; right: 0;">
+            <div class="map" style="z-index: 1; position: absolute; left: 0;"></div>
+            <div id="map-controls" class="map-controls" style="left: unset; right: 0.15em;">
                 <div class="button std icon icon-only toggle-auto-heading"
                      title="Toggle heading rotation"><ms>explore</ms></div>
                 <div class="button std icon icon-only toggle-auto-center"
@@ -132,10 +135,10 @@
                     <div class="button" onClick="changeCamera()">
                         <img src="./images/video.png">
                     </div>
-                    <div class="button">
-                        <a href="/pages/geo-settings.html?width=450&height=630&child-window" title="Open fan viewer geo settings window" target="fan-viewer-geo-settings"><img src="./images/settings.png"></a>
-                    </div>
                 </div>
+            </div>
+            <div class="titlebar-activator-wrapper" style="position: absolute; width: 100%; height: 50%; margin-left: 210px; margin-top: 100px !important;">
+                <div id="titlebar-activator" onclick="toggleTitlebar()"></div>
             </div>
         </div>
         <div id="hintbar">
