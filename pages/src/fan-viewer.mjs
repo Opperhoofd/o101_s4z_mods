@@ -113,6 +113,10 @@ async function loadRoboPacers() {
         case 11: { // Paris
             roboPacers = [5147310,5147315];
             break;
+        }
+        case 13: { // Scotland
+            roboPacers = [5147303,5147311,5147317,5147320];
+            break;
         }        
     }
 
