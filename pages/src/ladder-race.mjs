@@ -772,12 +772,9 @@ function handleFinishedRiders(finishedRiders) {
     if (settings.ladder.autoResultsDisabled) {
         state.finishedRiders = [];
         return;
+    } else {
+        finishedRiders = finishedRiders.filter(fr => !fr.dnf);
     }
-        
-    //finishedRiders = finishedRiders.filter(fr => !fr.pending);
-    //dnf
-    //filter out dns riders?
-    //evaluate race start?
 
     if (finishedRiders.length == 0) return;
 
