@@ -81,7 +81,7 @@ The groups race window give you more insights whats happening around you.
 ![O101-ladder-race](assets/images/O101-ladder-race.png)
 The ladder race window is made for... LADDER RACING! A great 5 vs 5 tactical racing format. The screenshot shows multiple states. Left is pre-race, middle is post-race and right is live.
 
-The ladder info is based on the current watching rider. So if you're scheduled for a race, you will see the race info. The watching rider can be overridden by Zwift ID at the bottom of the configuration page.
+The ladder info is based on the current watching rider. So if you're scheduled for a race, you will see the race info. The watching rider can be overridden by Zwift ID at the bottom of the configuration page. If no data loads, there's no race available today for the watching rider (ladder site queries by today, will be changed to now+24h in the future)
 
 The ladder windows has some characteristics of my nearby race v2 and groups race mod.
 
@@ -129,4 +129,4 @@ Fan viewer is a bit like the companion app. But then just the map and elevation.
 
 Also show your marked riders or robopacers of the world.
 
-There a camera view option which toggles cameras.
+There a camera view option which toggles cameras. Also a auto ride on bomb available, which nukes ride ons every 10 seconds.
