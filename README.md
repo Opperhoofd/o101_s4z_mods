@@ -101,7 +101,7 @@ If not needed, do NOT refresh the ladder window. It resets some configuration va
 
 **Manual configuration**: Once the race info is loaded, you can click "Enabled" and change the race info. For example a team name or badge.
 
-To fix late joiners or unknown riders you need to check "Show nearby riders". Then riders will be visible. Click the team badge to toggle teams. Once configured you can uncheck "Show nearby riders". Don't refresh the window as it will reset this manual configuration.
+To fix late joiners or unknown riders you need to check "Show nearby riders". Then riders will be visible. Click the team badge to toggle teams. Once configured you can uncheck "Show nearby riders". Don't refresh the window as it will reset this manual configuration. Manual configuration can only be enabled when the event is loaded. So always disable after the race!
 
 ## Overview
 ![O101-overview](assets/images/O101-overview.png)
